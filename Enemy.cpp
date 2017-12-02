@@ -3,10 +3,9 @@
 
 #pragma region Constructor
 
-Enemy::Enemy(int x, int y) : Object(ENEMY_TEXTURE_PATH)
+Enemy::Enemy(int x, int y) : Object(x, y, ENEMY_TEXTURE_PATH)
 {
-	this->x = x;
-	this->y = y;
+
 }
 
 #pragma endregion

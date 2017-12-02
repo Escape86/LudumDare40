@@ -9,7 +9,7 @@ class Texture;
 class Object
 {
 public:
-	Object(std::string texturePath);
+	Object(int x, int y, std::string texturePath);
 	virtual ~Object();
 
 	virtual void InjectFrame() = 0;

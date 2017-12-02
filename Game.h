@@ -5,6 +5,7 @@
 #pragma region Forward Declarations
 class Player;
 class Enemy;
+class AreaTrigger;
 #pragma endregion
 
 class Game
@@ -21,4 +22,5 @@ public:
 private:
 	Player* player;
 	std::vector<Enemy*> enemies;
+	std::vector<AreaTrigger*> areaTriggers;
 };

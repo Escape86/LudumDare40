@@ -1,11 +1,12 @@
 #include "Game.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "AreaTrigger.h"
 #include "Display.h"
+#include "Constants.h"
 
-int debug_collision_text_id = -1;
-
-const int JOYSTICK_DEAD_ZONE = 8000;
+int debug_enemy_collision_text_id = -1;
+int debug_areatrigger_collision_text_id = -1;
 
 #pragma region Constructor
 
@@ -15,8 +16,13 @@ Game::Game()
 
 	this->enemies.push_back(new Enemy(10, 25));
 
-	debug_collision_text_id = Display::CreateText("Player Collision", 0, 0);
-	Display::SetTextIsVisible(debug_collision_text_id, false);
+	this->areaTriggers.push_back(new AreaTrigger(500, 500));
+
+	debug_enemy_collision_text_id = Display::CreateText("Player Collision", 0, 0);
+	Display::SetTextIsVisible(debug_enemy_collision_text_id, false);
+
+	debug_areatrigger_collision_text_id = Display::CreateText("AreaTrigger Collision", 150, 0);
+	Display::SetTextIsVisible(debug_areatrigger_collision_text_id, false);
 }
 
 #pragma endregion
@@ -29,6 +35,18 @@ Game::~Game()
 	{
 		delete this->player;
 	}
+
+	for (Enemy* e : this->enemies)
+	{
+		delete e;
+	}
+	this->enemies.clear();
+
+	for (AreaTrigger* at : this->areaTriggers)
+	{
+		delete at;
+	}
+	this->areaTriggers.clear();
 }
 
 void Game::InjectFrame()
@@ -41,16 +59,33 @@ void Game::InjectFrame()
 	this->player->InjectFrame();
 
 	//now that movements are updated check for collisions
-	bool collision = false;
+	bool enemyCollision = false;
 	for (Enemy* const enemy : this->enemies)
 	{
 		if (this->player->TestCollision(enemy))
 		{
-			collision = true;
+			enemyCollision = true;
 			break;
 		}
 	}
-	Display::SetTextIsVisible(debug_collision_text_id, collision);
+	Display::SetTextIsVisible(debug_enemy_collision_text_id, enemyCollision);
+
+	bool areaTriggerCollision = false;
+	for (AreaTrigger* const at : this->areaTriggers)
+	{
+		if (this->player->TestCollision(at))
+		{
+			areaTriggerCollision = true;
+			break;
+		}
+	}
+	Display::SetTextIsVisible(debug_areatrigger_collision_text_id, areaTriggerCollision);
+
+	//draw area triggers
+	for (AreaTrigger* const at : this->areaTriggers)
+	{
+		at->Draw();
+	}
 
 	//draw enemies
 	for (Enemy* const enemy : this->enemies)

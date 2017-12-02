@@ -4,10 +4,10 @@
 
 #pragma region Constructor
 
-Object::Object(std::string texturePath)
+Object::Object(int x, int y, std::string texturePath)
 {
-	this->x = 0;
-	this->y = 0;
+	this->x = x;
+	this->y = y;
 
 	this->texture = new Texture(texturePath);
 	this->texture->Load();

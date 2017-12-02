@@ -5,11 +5,8 @@
 
 #pragma region Constructor
 
-Player::Player() : Object(PLAYER_TEXTURE_PATH)
+Player::Player() : Object(0, 0, PLAYER_TEXTURE_PATH)
 {
-	this->x = 0;
-	this->y = 0;
-
 	this->horizontalVelocity = 0;
 	this->verticalVelocity = 0;
 }
