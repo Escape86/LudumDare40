@@ -15,6 +15,8 @@ public:
 	void ResetHorizontalVelocity();
 	void ResetVerticalVelocity();
 
+	void SetElementType(ElementType type);
+
 private:
 	int horizontalVelocity;
 	int verticalVelocity;

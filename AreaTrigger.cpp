@@ -2,7 +2,7 @@
 #include "Constants.h"
 
 #pragma region Constructor
-AreaTrigger::AreaTrigger(int x, int y) : Object(x, y, AREATRIGGER_TEXTURE_PATH)
+AreaTrigger::AreaTrigger(int x, int y, ElementType type) : Object(x, y, ELEMENTTYPE_TO_CIRCLE_TEXTURE[type], type)
 {
 
 }

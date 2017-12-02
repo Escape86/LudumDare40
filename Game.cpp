@@ -14,9 +14,11 @@ Game::Game()
 {
 	this->player = new Player();
 
-	this->enemies.push_back(new Enemy(10, 25, 500, 500));
+	this->enemies.push_back(new Enemy(10, 25, 500, 500, ElementType::FIRE));
 
-	this->areaTriggers.push_back(new AreaTrigger(500, 500));
+	this->areaTriggers.push_back(new AreaTrigger(100, 100, ElementType::WATER));
+	this->areaTriggers.push_back(new AreaTrigger(500, 500, ElementType::FIRE));
+	this->areaTriggers.push_back(new AreaTrigger(250, 500, ElementType::PLANT));
 
 	debug_enemy_collision_text_id = Display::CreateText("Player Collision", 0, 0);
 	Display::SetTextIsVisible(debug_enemy_collision_text_id, false);
@@ -76,6 +78,7 @@ void Game::InjectFrame()
 		if (this->player->TestCollision(at))
 		{
 			areaTriggerCollision = true;
+			this->player->SetElementType(at->GetElementType());
 			break;
 		}
 	}

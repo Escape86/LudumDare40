@@ -5,7 +5,7 @@
 
 #pragma region Constructor
 
-Player::Player() : Object(0, 0, PLAYER_TEXTURE_PATH)
+Player::Player() : Object(0, 0, BLACK_DOT_TEXTURE_PATH, ElementType::NONE)
 {
 	this->horizontalVelocity = 0;
 	this->verticalVelocity = 0;
@@ -110,6 +110,14 @@ void Player::ResetHorizontalVelocity()
 void Player::ResetVerticalVelocity()
 {
 	this->verticalVelocity = 0;
+}
+
+void Player::SetElementType(ElementType type)
+{
+	this->type = type;
+
+	//destroy old texture and replace with new one that matches our new element type
+	this->SetTexture(ELEMENTTYPE_TO_DOT_TEXTURE[type]);
 }
 
 #pragma endregion

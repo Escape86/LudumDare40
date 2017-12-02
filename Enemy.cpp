@@ -3,7 +3,7 @@
 
 #pragma region Constructor
 
-Enemy::Enemy(int x, int y, int targetX, int targetY) : Object(x, y, ENEMY_TEXTURE_PATH)
+Enemy::Enemy(int x, int y, int targetX, int targetY, ElementType type) : Object(x, y, ELEMENTTYPE_TO_DOT_TEXTURE[type], type)
 {
 	this->targetX = targetX;
 	this->targetY = targetY;

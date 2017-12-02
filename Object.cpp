@@ -4,17 +4,13 @@
 
 #pragma region Constructor
 
-Object::Object(int x, int y, std::string texturePath)
+Object::Object(int x, int y, std::string texturePath, ElementType type)
 {
 	this->x = x;
 	this->y = y;
+	this->type = type;
 
-	this->texture = new Texture(texturePath);
-	this->texture->Load();
-
-	//TODO: pulling this from texture size is probably not ideal
-	this->width = this->texture->GetWidth();
-	this->height = this->texture->GetHeight();
+	this->SetTexture(texturePath);
 }
 
 #pragma endregion
@@ -77,6 +73,26 @@ bool Object::TestCollision(Object* otherObject)
 
 	//If none of the sides from A are outside B
 	return true;
+}
+
+void Object::SetTexture(std::string texturePath)
+{
+	if (this->texture)
+	{
+		delete this->texture;
+	}
+
+	this->texture = new Texture(texturePath);
+	this->texture->Load();
+
+	//TODO: pulling this from texture size is probably not ideal
+	this->width = this->texture->GetWidth();
+	this->height = this->texture->GetHeight();
+}
+
+ElementType Object::GetElementType()
+{
+	return this->type;
 }
 
 #pragma endregion

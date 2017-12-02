@@ -5,7 +5,7 @@
 class AreaTrigger : public Object
 {
 public:
-	AreaTrigger(int x, int y);
+	AreaTrigger(int x, int y, ElementType type);
 	~AreaTrigger();
 
 	void InjectFrame() override;
