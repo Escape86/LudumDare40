@@ -29,11 +29,28 @@ public:
 
 	static TTF_Font* const GetFont();
 
+	struct QueuedText
+	{
+		int x;
+		int y;
+		std::string text;
+		SDL_Color textColor;
+		bool isVisible;
+		int id;
+	};
+
+	static int CreateText(std::string text, int x, int y, SDL_Color textColor = { 0, 0, 0 });
+	static bool UpdateText(int id, std::string text);
+	static bool MoveText(int id, int x, int y);
+	static bool SetTextIsVisible(int id, bool isVisible);
+	static bool RemoveText(int id);
+
 private:
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
 	static TTF_Font* font;
 	static std::function<void(SDL_Event e)> eventCallback;
+	static int textControlIdCounter;
 
 	struct QueuedTexture 
 	{
@@ -43,12 +60,5 @@ private:
 	};
 	static std::vector<QueuedTexture> textureQueue;
 
-	struct QueuedText
-	{
-		int x;
-		int y;
-		std::string text;
-		SDL_Color textColor;
-	};
 	static std::vector<QueuedText> textQueue;
 };

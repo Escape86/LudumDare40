@@ -144,20 +144,18 @@ void Display::InjectFrame()
 
 	Display::textureQueue.clear();
 
-
-	Display::textQueue.push_back(QueuedText { 0, 0, "hello world", { 0, 0, 0 } });
-
 	for (std::vector<QueuedText>::iterator it = Display::textQueue.begin(); it != Display::textQueue.end(); ++it)
 	{
-		Texture* t = Texture::CreateFromText(it->text);
+		if (!it->isVisible)
+			continue;
+
+		Texture* t = Texture::CreateFromText(it->text, it->textColor);
 		
 		if(t)
 			t->Draw(it->x, it->y);
 
 		delete t;
 	}
-
-	Display::textQueue.clear();
 	
 	//Update screen
 	SDL_RenderPresent(Display::renderer);
@@ -193,6 +191,70 @@ TTF_Font* const Display::GetFont()
 	return Display::font;
 }
 
+int Display::CreateText(std::string text, int x, int y, SDL_Color textColor /*= { 0, 0, 0 }*/)
+{
+	int id = Display::textControlIdCounter++;
+	Display::textQueue.push_back(QueuedText{ x, y, text, textColor, true, id });
+	return id;
+}
+
+bool Display::UpdateText(int id, std::string text)
+{
+	for (QueuedText& qt : Display::textQueue)
+	{
+		if (qt.id == id)
+		{
+			qt.text = text;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Display::MoveText(int id, int x, int y)
+{
+	for (QueuedText& qt : Display::textQueue)
+	{
+		if (qt.id == id)
+		{
+			qt.x = x;
+			qt.y = y;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Display::SetTextIsVisible(int id, bool isVisible)
+{
+	for (QueuedText& qt : Display::textQueue)
+	{
+		if (qt.id == id)
+		{
+			qt.isVisible = isVisible;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Display::RemoveText(int id)
+{
+	for (std::vector<QueuedText>::iterator it = Display::textQueue.begin(); it != Display::textQueue.end(); ++it)
+	{
+		if (it->id == id)
+		{
+			Display::textQueue.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 #pragma endregion
 
 #pragma region Static Member Initialization
@@ -203,5 +265,6 @@ TTF_Font* Display::font;
 std::function<void(SDL_Event e)> Display::eventCallback;
 std::vector<Display::QueuedTexture> Display::textureQueue;
 std::vector<Display::QueuedText> Display::textQueue;
+int Display::textControlIdCounter = 0;
 
 #pragma endregion
