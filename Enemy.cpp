@@ -1,8 +1,9 @@
 #include "Enemy.h"
+#include "Constants.h"
 
 #pragma region Constructor
 
-Enemy::Enemy(int x, int y) : Object("resources/enemy.bmp")
+Enemy::Enemy(int x, int y) : Object(ENEMY_TEXTURE_PATH)
 {
 	this->x = x;
 	this->y = y;

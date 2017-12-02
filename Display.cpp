@@ -1,17 +1,13 @@
 #include "Display.h"
 #include "Texture.h"
+#include "Constants.h"
 
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <iostream>
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-const char* fontPath = "resources/lazy.ttf";
-const int fontSize = 28;
+const int fontSize = 18;
 
 #pragma region Public Methods
 
@@ -65,7 +61,7 @@ bool Display::Initialize()
 	}
 
 	//Initialize Font
-	Display::font = TTF_OpenFont(fontPath, fontSize);
+	Display::font = TTF_OpenFont(FONT_FILEPATH, fontSize);
 	if (Display::font == nullptr)
 	{
 		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -130,25 +126,11 @@ void Display::InjectFrame()
 		}
 	}
 
-	//Move the dot and check collision
-	/*dot.move(wall);*/
-
 	//Clear screen
 	SDL_SetRenderDrawColor(Display::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(Display::renderer);
 
-	//Render thing
-	//SDL_Rect thing;
-	//thing.x = 300;
-	//thing.y = 40;
-	//thing.w = 40;
-	//thing.h = 400;
-
 	SDL_SetRenderDrawColor(Display::renderer, 0x00, 0x00, 0x00, 0xFF);
-	//SDL_RenderDrawRect(Display::renderer, &thing);
-
-	//Render dot
-	//dot.render();
 
 	//draw our queued up textures
 	for (std::vector<QueuedTexture>::iterator it = Display::textureQueue.begin(); it != Display::textureQueue.end(); ++it)

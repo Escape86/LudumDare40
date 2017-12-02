@@ -1,12 +1,11 @@
 #include "Player.h"
 #include "Texture.h"
 #include "Display.h"
-
-const int PLAYER_VELOCITY = 10;
+#include "Constants.h"
 
 #pragma region Constructor
 
-Player::Player() : Object("resources/dot.bmp")
+Player::Player() : Object(PLAYER_TEXTURE_PATH)
 {
 	this->x = 0;
 	this->y = 0;
