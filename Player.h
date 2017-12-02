@@ -1,27 +1,18 @@
 #pragma once
 
-#pragma region Forward Declarations
-class Texture;
-#pragma endregion
+#include "Object.h"
 
-class Player
+class Player : public Object
 {
 public:
 	Player();
 	~Player();
 
-	void InjectFrame();
-	void Draw();
+	void InjectFrame() override;
 	void OnKeyDown(int key);
 	void OnKeyUp(int key);
 
 private:
-	int x;
-	int y;
 	int horizontalVelocity;
 	int verticalVelocity;
-	int width;
-	int height;
-
-	Texture* texture;
 };

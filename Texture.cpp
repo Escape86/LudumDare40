@@ -6,6 +6,10 @@
 	#include <assert.h>
 #endif
 
+const Uint8 opacityR = 0xFF;
+const Uint8 opacityG = 0xFF;
+const Uint8 opacityB = 0xFF;
+
 #pragma region Constructor
 
 Texture::Texture(const std::string path)
@@ -54,7 +58,7 @@ bool Texture::Load()
 	}
 
 	//Color key image
-	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
+	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, opacityR, opacityG, opacityB));
 
 	//Create texture from surface pixels
 	this->sdl_texture = SDL_CreateTextureFromSurface(Display::GetRenderer(), loadedSurface);

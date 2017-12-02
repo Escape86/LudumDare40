@@ -6,20 +6,13 @@ const int PLAYER_VELOCITY = 10;
 
 #pragma region Constructor
 
-Player::Player()
+Player::Player() : Object("resources/dot.bmp")
 {
 	this->x = 0;
 	this->y = 0;
 
 	this->horizontalVelocity = 0;
 	this->verticalVelocity = 0;
-
-	this->texture = new Texture("resources/dot.bmp");
-	this->texture->Load();
-
-	//TODO: pulling this from texture size is probably not ideal
-	this->width = this->texture->GetWidth();
-	this->height = this->texture->GetHeight();
 }
 
 #pragma endregion
@@ -28,10 +21,7 @@ Player::Player()
 
 Player::~Player()
 {
-	if (this->texture)
-	{
-		delete this->texture;
-	}
+
 }
 
 void Player::InjectFrame()
@@ -46,14 +36,6 @@ void Player::InjectFrame()
 
 	if (this->y < 0 || this->y + this->height > Display::GetScreenHeight())
 		this->y -= this->verticalVelocity;
-
-	//render
-	this->Draw();
-}
-
-void Player::Draw()
-{
-	Display::QueueTextureForRendering(this->texture, this->x, this->y);
 }
 
 void Player::OnKeyDown(int key)

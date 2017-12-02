@@ -1,11 +1,14 @@
 #include "Game.h"
 #include "Player.h"
+#include "Enemy.h"
 
 #pragma region Constructor
 
 Game::Game()
 {
 	this->player = new Player();
+
+	this->enemies.push_back(new Enemy(10, 25));
 }
 
 #pragma endregion
@@ -22,7 +25,24 @@ Game::~Game()
 
 void Game::InjectFrame()
 {
+	for (Enemy* const enemy : this->enemies)
+	{
+		enemy->InjectFrame();
+	}
+
 	this->player->InjectFrame();
+
+	//now that movements are updated check for collisions
+
+
+	//draw enemies
+	for (Enemy* const enemy : this->enemies)
+	{
+		enemy->Draw();
+	}
+
+	//draw player
+	this->player->Draw();
 }
 
 void Game::InjectKeyDown(int key)
