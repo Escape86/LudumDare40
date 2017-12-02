@@ -18,7 +18,7 @@ const int fontSize = 28;
 bool Display::Initialize()
 {
 	//Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
 	{
 		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
 		return false;
@@ -72,6 +72,17 @@ bool Display::Initialize()
 		return false;
 	}
 
+	//check if a JoyStick is present
+	if (SDL_NumJoysticks() > 0)
+	{
+		//Load joystick
+		Display::gameController = SDL_JoystickOpen(0);
+		if (gameController == nullptr)
+		{
+			printf("Warning: Unable to open game controller! SDL Error: %s\n", SDL_GetError());
+		}
+	}
+
 	//everything initialized correctly!
 	return true;
 }
@@ -84,6 +95,10 @@ bool Display::ShutDown()
 		delete (it->texture);
 		it = textureQueue.erase(it);
 	}
+
+	//Close game controller
+	SDL_JoystickClose(Display::gameController);
+	Display::gameController = nullptr;
 
 	//Free font
 	TTF_CloseFont(Display::font);
@@ -263,6 +278,7 @@ SDL_Window* Display::window = nullptr;
 SDL_Renderer* Display::renderer = nullptr;
 TTF_Font* Display::font;
 std::function<void(SDL_Event e)> Display::eventCallback;
+SDL_Joystick* Display::gameController = nullptr;
 std::vector<Display::QueuedTexture> Display::textureQueue;
 std::vector<Display::QueuedText> Display::textQueue;
 int Display::textControlIdCounter = 0;

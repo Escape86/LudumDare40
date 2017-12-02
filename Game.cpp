@@ -5,6 +5,8 @@
 
 int debug_collision_text_id = -1;
 
+const int JOYSTICK_DEAD_ZONE = 8000;
+
 #pragma region Constructor
 
 Game::Game()
@@ -68,6 +70,50 @@ void Game::InjectKeyDown(int key)
 void Game::InjectKeyUp(int key)
 {
 	this->player->OnKeyUp(key);
+}
+
+void Game::InjectControllerStickMovement(uint8_t axis, int16_t value)
+{
+	//X axis motion
+	if (axis == 0)
+	{
+		//Left of dead zone
+		if (value < -JOYSTICK_DEAD_ZONE)
+		{
+			//fake a keypress for the left direction
+			this->player->OnKeyDown(SDLK_LEFT);
+		}
+		//Right of dead zone
+		else if (value > JOYSTICK_DEAD_ZONE)
+		{
+			//fake a keypress for the right direction
+			this->player->OnKeyDown(SDLK_RIGHT);
+		}
+		else
+		{
+			this->player->ResetHorizontalVelocity();
+		}
+	}
+	//Y axis motion
+	else if (axis == 1)
+	{
+		//Above of dead zone
+		if (value < -JOYSTICK_DEAD_ZONE)
+		{
+			//fake a keypress for the up direction
+			this->player->OnKeyDown(SDLK_UP);
+		}
+		//Below of dead zone
+		else if (value > JOYSTICK_DEAD_ZONE)
+		{
+			//fake a keypress for the down direction
+			this->player->OnKeyDown(SDLK_DOWN);
+		}
+		else
+		{
+			this->player->ResetVerticalVelocity();
+		}
+	}
 }
 
 #pragma endregion

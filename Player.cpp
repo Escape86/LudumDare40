@@ -106,4 +106,14 @@ void Player::OnKeyUp(int key)
 		this->horizontalVelocity = -PLAYER_VELOCITY;
 }
 
+void Player::ResetHorizontalVelocity()
+{
+	this->horizontalVelocity = 0;
+}
+
+void Player::ResetVerticalVelocity()
+{
+	this->verticalVelocity = 0;
+}
+
 #pragma endregion

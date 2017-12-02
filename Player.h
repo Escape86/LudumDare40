@@ -12,6 +12,9 @@ public:
 	void OnKeyDown(int key);
 	void OnKeyUp(int key);
 
+	void ResetHorizontalVelocity();
+	void ResetVerticalVelocity();
+
 private:
 	int horizontalVelocity;
 	int verticalVelocity;

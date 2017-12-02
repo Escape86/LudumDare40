@@ -50,6 +50,7 @@ private:
 	static SDL_Renderer* renderer;
 	static TTF_Font* font;
 	static std::function<void(SDL_Event e)> eventCallback;
+	static SDL_Joystick* gameController;
 	static int textControlIdCounter;
 
 	struct QueuedTexture 

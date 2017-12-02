@@ -31,6 +31,14 @@ int main(int argc, char* args[])
 				if (e.key.repeat == 0)
 					game->InjectKeyUp((int)e.key.keysym.sym);
 				break;
+			case SDL_JOYAXISMOTION:
+				//did the event occur on ControllerID 0 ?
+				if (e.jaxis.which == 0)
+				{
+					//yup, so publish the event
+					game->InjectControllerStickMovement(e.jaxis.axis, e.jaxis.value);
+				}
+				break;
 			case SDL_QUIT:
 				keepRunning = false;
 			break;

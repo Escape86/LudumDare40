@@ -16,6 +16,7 @@ public:
 	void InjectFrame();
 	void InjectKeyDown(int key);
 	void InjectKeyUp(int key);
+	void InjectControllerStickMovement(uint8_t axis, int16_t value);
 
 private:
 	Player* player;
