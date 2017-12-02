@@ -25,4 +25,14 @@ void Game::InjectFrame()
 	this->player->InjectFrame();
 }
 
+void Game::InjectKeyDown(int key)
+{
+	this->player->OnKeyDown(key);
+}
+
+void Game::InjectKeyUp(int key)
+{
+	this->player->OnKeyUp(key);
+}
+
 #pragma endregion

@@ -12,6 +12,9 @@ public:
 	bool Load();
 	void Draw(int x, int y, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
+	int GetWidth();
+	int GetHeight();
+
 private:
 	bool isLoaded;
 	int width;

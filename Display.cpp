@@ -82,16 +82,14 @@ bool Display::ShutDown()
 void Display::InjectFrame()
 {
 	//Handle events on queue
-	while (SDL_PollEvent(&Display::eventHandler) != 0)
+	SDL_Event eventHandler;
+	while (SDL_PollEvent(&eventHandler) != 0)
 	{
-		//User requests quit
-		if (Display::eventHandler.type == SDL_QUIT)
+		//publish events
+		if (Display::eventCallback != nullptr)
 		{
-			//quit = true;
+			Display::eventCallback(eventHandler);
 		}
-
-		//Handle input for the dot
-		//dot.handleEvent(e);
 	}
 
 	//Move the dot and check collision
@@ -121,9 +119,15 @@ void Display::InjectFrame()
 		t->Draw(it->x, it->y);
 	}
 
+	Display::textureQueue.clear();
 
 	//Update screen
 	SDL_RenderPresent(Display::renderer);
+}
+
+void Display::SetEventCallback(std::function<void(SDL_Event e)> eventCallback)
+{
+	Display::eventCallback = eventCallback;
 }
 
 SDL_Renderer* const Display::GetRenderer()
@@ -136,13 +140,23 @@ void Display::QueueTextureForRendering(Texture* const texture, int x, int y)
 	Display::textureQueue.push_back({ texture, x, y });
 }
 
+int Display::GetScreenWidth()
+{
+	return SCREEN_WIDTH;
+}
+
+int Display::GetScreenHeight()
+{
+	return SCREEN_HEIGHT;
+}
+
 #pragma endregion
 
 #pragma region Static Member Initialization
 
 SDL_Window* Display::window = nullptr;
 SDL_Renderer* Display::renderer = nullptr;
-SDL_Event Display::eventHandler;
+std::function<void(SDL_Event e)> Display::eventCallback;
 std::vector<Display::QueuedTexture> Display::textureQueue;
 
 #pragma endregion

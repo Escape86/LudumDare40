@@ -13,6 +13,8 @@ public:
 	~Game();
 
 	void InjectFrame();
+	void InjectKeyDown(int key);
+	void InjectKeyUp(int key);
 
 private:
 	Player* player;

@@ -21,12 +21,13 @@ Texture::Texture(const std::string path)
 Texture::~Texture()
 {
 	//Free texture if it exists
-	if (this->sdl_texture != nullptr)
+	if (this->isLoaded)
 	{
 		SDL_DestroyTexture(this->sdl_texture);
 		this->sdl_texture = nullptr;
 		this->width = 0;
 		this->height = 0;
+		this->isLoaded = false;
 	}
 }
 
@@ -91,6 +92,16 @@ void Texture::Draw(int x, int y, SDL_Rect* clip /*= nullptr*/, double angle /*= 
 
 	//Render to screen
 	SDL_RenderCopyEx(Display::GetRenderer(), this->sdl_texture, clip, &renderQuad, angle, center, flip);
+}
+
+int Texture::GetWidth()
+{
+	return this->width;
+}
+
+int Texture::GetHeight()
+{
+	return this->height;
 }
 
 #pragma endregion

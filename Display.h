@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 #include "SDL_events.h"
 
 #pragma region Forward Declarations
@@ -17,14 +18,18 @@ public:
 	static bool Initialize();
 	static bool ShutDown();
 	static void InjectFrame();
+	static void SetEventCallback(std::function<void(SDL_Event e)> eventCallback);
 
 	static SDL_Renderer* const GetRenderer();
 	static void QueueTextureForRendering(Texture* const texture, int x, int y);
 
+	static int GetScreenWidth();
+	static int GetScreenHeight();
+
 private:
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
-	static SDL_Event eventHandler;
+	static std::function<void(SDL_Event e)> eventCallback;
 
 	struct QueuedTexture 
 	{
