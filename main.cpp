@@ -18,7 +18,14 @@ int main(int argc, char* args[])
 		{
 			case SDL_KEYDOWN:
 				if (e.key.repeat == 0)
+				{
+					if (e.key.keysym.sym == SDLK_ESCAPE)
+					{
+						keepRunning = false;
+					}
+
 					game->InjectKeyDown((int)e.key.keysym.sym);
+				}
 				break;
 			case SDL_KEYUP:
 				if (e.key.repeat == 0)
