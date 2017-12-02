@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "Display.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 
 #ifdef _DEBUG
 	#include <assert.h>
@@ -18,6 +19,11 @@ Texture::Texture(const std::string path)
 	this->isLoaded = false;
 }
 
+Texture::Texture()
+{
+
+}
+
 #pragma endregion
 
 #pragma region Public Methods
@@ -33,6 +39,38 @@ Texture::~Texture()
 		this->height = 0;
 		this->isLoaded = false;
 	}
+}
+
+Texture* Texture::CreateFromText(const std::string text)
+{
+	Texture* t = new Texture();
+
+	//Render text surface
+	SDL_Surface* textSurface = TTF_RenderText_Solid(Display::GetFont(), text.c_str(), SDL_Color { 0, 0, 0 });
+	if (textSurface == nullptr)
+	{
+		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+		return nullptr;
+	}
+
+	//Create texture from surface pixels
+	t->sdl_texture = SDL_CreateTextureFromSurface(Display::GetRenderer(), textSurface);
+	if (t == nullptr)
+	{
+		printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+		return nullptr;
+	}
+
+	//Get image dimensions
+	t->width = textSurface->w;
+	t->height = textSurface->h;
+
+	//Get rid of old surface
+	SDL_FreeSurface(textSurface);
+
+	t->isLoaded = true;
+
+	return t;
 }
 
 bool Texture::Load()

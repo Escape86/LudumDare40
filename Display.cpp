@@ -3,11 +3,15 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <iostream>
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+
+const char* fontPath = "resources/lazy.ttf";
+const int fontSize = 28;
 
 #pragma region Public Methods
 
@@ -53,6 +57,21 @@ bool Display::Initialize()
 		return false;
 	}
 
+	//Initialize SDL_ttf
+	if (TTF_Init() == -1)
+	{
+		printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+		return false;
+	}
+
+	//Initialize Font
+	Display::font = TTF_OpenFont(fontPath, fontSize);
+	if (Display::font == nullptr)
+	{
+		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+		return false;
+	}
+
 	//everything initialized correctly!
 	return true;
 }
@@ -65,6 +84,10 @@ bool Display::ShutDown()
 		delete (it->texture);
 		it = textureQueue.erase(it);
 	}
+
+	//Free font
+	TTF_CloseFont(Display::font);
+	Display::font = nullptr;
 
 	//Destroy window	
 	SDL_DestroyRenderer(Display::renderer);
@@ -121,6 +144,21 @@ void Display::InjectFrame()
 
 	Display::textureQueue.clear();
 
+
+	Display::textQueue.push_back(QueuedText { 0, 0, "hello world", { 0, 0, 0 } });
+
+	for (std::vector<QueuedText>::iterator it = Display::textQueue.begin(); it != Display::textQueue.end(); ++it)
+	{
+		Texture* t = Texture::CreateFromText(it->text);
+		
+		if(t)
+			t->Draw(it->x, it->y);
+
+		delete t;
+	}
+
+	Display::textQueue.clear();
+	
 	//Update screen
 	SDL_RenderPresent(Display::renderer);
 }
@@ -150,13 +188,20 @@ int Display::GetScreenHeight()
 	return SCREEN_HEIGHT;
 }
 
+TTF_Font* const Display::GetFont()
+{
+	return Display::font;
+}
+
 #pragma endregion
 
 #pragma region Static Member Initialization
 
 SDL_Window* Display::window = nullptr;
 SDL_Renderer* Display::renderer = nullptr;
+TTF_Font* Display::font;
 std::function<void(SDL_Event e)> Display::eventCallback;
 std::vector<Display::QueuedTexture> Display::textureQueue;
+std::vector<Display::QueuedText> Display::textQueue;
 
 #pragma endregion

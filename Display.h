@@ -3,6 +3,7 @@
 #include <vector>
 #include <functional>
 #include "SDL_events.h"
+#include "SDL_ttf.h"
 
 #pragma region Forward Declarations
 struct SDL_Window;
@@ -26,9 +27,12 @@ public:
 	static int GetScreenWidth();
 	static int GetScreenHeight();
 
+	static TTF_Font* const GetFont();
+
 private:
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
+	static TTF_Font* font;
 	static std::function<void(SDL_Event e)> eventCallback;
 
 	struct QueuedTexture 
@@ -38,4 +42,13 @@ private:
 		int y;
 	};
 	static std::vector<QueuedTexture> textureQueue;
+
+	struct QueuedText
+	{
+		int x;
+		int y;
+		std::string text;
+		SDL_Color textColor;
+	};
+	static std::vector<QueuedText> textQueue;
 };
