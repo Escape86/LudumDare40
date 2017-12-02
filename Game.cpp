@@ -14,7 +14,7 @@ Game::Game()
 {
 	this->player = new Player();
 
-	this->enemies.push_back(new Enemy(10, 25));
+	this->enemies.push_back(new Enemy(10, 25, 500, 500));
 
 	this->areaTriggers.push_back(new AreaTrigger(500, 500));
 

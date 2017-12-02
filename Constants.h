@@ -10,5 +10,8 @@
 
 #define SCREEN_WIDTH				800
 #define SCREEN_HEIGHT				600
+
 #define PLAYER_VELOCITY				10
+#define ENEMY_VELOCITY				1
+
 #define JOYSTICK_DEAD_ZONE			8000
