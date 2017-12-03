@@ -18,8 +18,10 @@ public:
 	void ResetVerticalVelocity();
 
 	void HandleElementCollision(ElementType typeFromCollision);
-	int GetElementStrength();
-	void SetElementStrength(int value);
+	int GetOrbCount();
+	void SetOrbCount(int value);
+	int GetMaxOrbCount();
+	void SetMaxOrbCount(int value);
 
 	int GetHp();
 	void SetHp(int hp);
@@ -28,7 +30,8 @@ private:
 	int horizontalVelocity;
 	int verticalVelocity;
 
-	int elementStrength;
+	int orbCount;
+	int maxOrbCount;
 	int hp;
 
 	Texture* overlayTexture;

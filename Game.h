@@ -20,6 +20,6 @@ private:
 	Player* player;
 	Level* currentLevel;
 
-	int playerElementStrengthTextId;
+	int playerOrbCountTextId;
 	int playerHpTextId;
 };

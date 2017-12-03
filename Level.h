@@ -17,10 +17,14 @@ public:
 	std::vector<Enemy*>& GetEnemies();
 	std::vector<AreaTrigger*>& GetShrines();
 
+	const int GetOrbCapacityForThisLevel();
+
 private:
 	static Level* createLevel1();
+	static Level* createLevel2();
+	static Level* createLevel3();
 
-	Level();
+	Level(int orbCapcityForThisLevel);
 	~Level();
 
 	std::vector<Enemy*> enemies;
@@ -32,4 +36,6 @@ private:
 		Enemy* enemy;
 	};
 	std::vector<QueuedEnemy> queuedEnemies;
+
+	const int orbCapacityForPlayer;
 };

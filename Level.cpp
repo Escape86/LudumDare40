@@ -42,12 +42,17 @@ std::vector<AreaTrigger*>& Level::GetShrines()
 	return this->areaTriggers;
 }
 
+const int Level::GetOrbCapacityForThisLevel()
+{
+	return this->orbCapacityForPlayer;
+}
+
 #pragma endregion
 
 #pragma region Private Methods
 
 #pragma region Constructor
-Level::Level()
+Level::Level(int orbCapcityForThisLevel) : orbCapacityForPlayer(orbCapcityForThisLevel)
 {
 
 }
@@ -70,7 +75,27 @@ Level::~Level()
 
 Level* Level::createLevel1()
 {
-	Level* l = new Level();
+	Level* l = new Level(5);
+
+	return l;
+}
+
+Level* Level::createLevel2()
+{
+	Level* l = new Level(5);
+
+	const int waterShrineX = SCREEN_WIDTH / 2;
+	const int waterShrineY = SCREEN_HEIGHT - 40;
+
+	l->areaTriggers.push_back(new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER));
+
+
+	return l;
+}
+
+Level* Level::createLevel3()
+{
+	Level* l = new Level(5);
 
 	const int waterShrineX = SCREEN_WIDTH / 2;
 	const int waterShrineY = 40;
@@ -88,7 +113,7 @@ Level* Level::createLevel1()
 	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
 	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
 	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	
+
 	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
 	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
 	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
@@ -97,6 +122,4 @@ Level* Level::createLevel1()
 
 	return l;
 }
-
-
 #pragma endregion

@@ -10,7 +10,7 @@ Player::Player() : Object((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), BLACK_DOT_TEX
 	this->horizontalVelocity = 0;
 	this->verticalVelocity = 0;
 
-	this->elementStrength = 0;
+	this->orbCount = 0;
 	this->hp = 100;
 
 	this->overlayTexture = new Texture(PLAYER_OVERLAY_TEXTURE_PATH);
@@ -154,15 +154,15 @@ void Player::HandleElementCollision(ElementType typeFromCollision)
 	//did we collide with our current element?
 	if (this->type == typeFromCollision)
 	{
-		this->elementStrength++;
+		this->orbCount++;
 		return;
 	}
 
 	//are we neutral?
-	if (this->elementStrength == 0)
+	if (this->orbCount == 0)
 	{
 		this->type = typeFromCollision;
-		this->elementStrength = 1;
+		this->orbCount = 1;
 
 		//destroy old texture and replace with new one that matches our new element type
 		this->SetTexture(ELEMENTTYPE_TO_DOT_TEXTURE[this->type]);
@@ -174,16 +174,16 @@ void Player::HandleElementCollision(ElementType typeFromCollision)
 	if (ELEMENTTYPE_WEAKNESS[this->type] == typeFromCollision)
 	{
 		this->hp--;
-		this->elementStrength--;
+		this->orbCount--;
 	}
 	//check if we are the weakness of what we collided with
 	else if (ELEMENTTYPE_WEAKNESS[typeFromCollision] == this->type)
 	{
-		this->elementStrength--;
+		this->orbCount--;
 	}
 
 	//did we become neutral as a result?
-	if (this->elementStrength == 0)
+	if (this->orbCount == 0)
 	{
 		this->type = ElementType::NONE;
 
@@ -192,14 +192,24 @@ void Player::HandleElementCollision(ElementType typeFromCollision)
 	}
 }
 
-int Player::GetElementStrength()
+int Player::GetOrbCount()
 {
-	return this->elementStrength;
+	return this->orbCount;
 }
 
-void Player::SetElementStrength(int value)
+void Player::SetOrbCount(int value)
 {
-	this->elementStrength = value;
+	this->orbCount = value;
+}
+
+int Player::GetMaxOrbCount()
+{
+	return this->maxOrbCount;
+}
+
+void Player::SetMaxOrbCount(int value)
+{
+	this->maxOrbCount = value;
 }
 
 int Player::GetHp()

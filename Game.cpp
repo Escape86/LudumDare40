@@ -21,9 +21,12 @@ Game::Game()
 		printf("Failed to load level1!\n");
 	}
 
+	//set player's orb capacity
+	this->player->SetMaxOrbCount(this->currentLevel->GetOrbCapacityForThisLevel());
+
 	//create text controls for the UI
-	playerElementStrengthTextId = Display::CreateText("x0", SCREEN_WIDTH - 35, 2, BLACK);
-	playerHpTextId = Display::CreateText("100%", 2, 2, BLACK);
+	playerOrbCountTextId = Display::CreateText("", SCREEN_WIDTH - 62, 2, BLACK);
+	playerHpTextId = Display::CreateText("", 2, 2, BLACK);
 }
 
 #pragma endregion
@@ -105,9 +108,9 @@ void Game::InjectFrame()
 	sprintf_s(hpText, "%d%%", this->player->GetHp());
 	Display::UpdateText(this->playerHpTextId, hpText);
 
-	char elementStrengthText[8];
-	sprintf_s(elementStrengthText, "x%d", this->player->GetElementStrength());
-	Display::UpdateText(this->playerElementStrengthTextId, elementStrengthText);
+	char orbCountText[8];
+	sprintf_s(orbCountText, "x%d/%d", this->player->GetOrbCount(), this->player->GetMaxOrbCount());
+	Display::UpdateText(this->playerOrbCountTextId, orbCountText);
 }
 
 void Game::InjectKeyDown(int key)
