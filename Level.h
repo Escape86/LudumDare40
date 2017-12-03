@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "Display.h"
 
 #pragma region Forward Declarations
 class Enemy;
@@ -38,4 +39,17 @@ private:
 	std::vector<QueuedEnemy> queuedEnemies;
 
 	const int orbCapacityForPlayer;
+
+	struct QueuedText
+	{
+		int x;
+		int y;
+		std::string text;
+		unsigned int whenToShow;
+		int durationToShow;
+		Display::FontSize fontSize;
+		bool isBeingShown;
+		int idFromCreation;
+	};
+	std::vector<QueuedText> queuedText;
 };

@@ -10,6 +10,10 @@ Level* Level::Load(int levelNumber)
 	{
 		case 1:
 			return createLevel1();
+		case 2:
+			return createLevel2();
+		case 3:
+			return createLevel3();
 
 		default:
 			return nullptr;
@@ -26,6 +30,31 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 			this->enemies.push_back(it->enemy);
 			it = this->queuedEnemies.erase(it);
 			continue;
+		}
+
+		++it;
+	}
+
+	for (std::vector<QueuedText>::iterator it = this->queuedText.begin(); it != this->queuedText.end();)
+	{
+		if (it->isBeingShown)
+		{
+			if (it->durationToShow > -1 && elapsedGameTimeInMilliseconds >= (it->whenToShow + it->durationToShow))
+			{
+				//text is expired, remove it
+				Display::RemoveText(it->idFromCreation);
+				it = this->queuedText.erase(it);
+				continue;
+			}
+		}
+		else
+		{
+			if (elapsedGameTimeInMilliseconds >= it->whenToShow)
+			{
+				//time to show the text
+				it->idFromCreation = Display::CreateText(it->text, it->x, it->y, it->fontSize);
+				it->isBeingShown = true;
+			}
 		}
 
 		++it;
@@ -76,7 +105,7 @@ Level::~Level()
 Level* Level::createLevel1()
 {
 	Level* l = new Level(5);
-
+	l->queuedText.push_back({ 100, 100, "Welcome to Elemental Balance", 500, -1, Display::FontSize::THIRTYFOUR, false, -1});
 	return l;
 }
 

@@ -7,8 +7,6 @@
 #include <SDL_ttf.h>
 #include <iostream>
 
-const int fontSize = 20;
-
 #pragma region Public Methods
 
 bool Display::Initialize()
@@ -60,13 +58,9 @@ bool Display::Initialize()
 		return false;
 	}
 
-	//Initialize Font
-	Display::font = TTF_OpenFont(FONT_FILEPATH, fontSize);
-	if (Display::font == nullptr)
-	{
-		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+	//Initialize Fonts
+	if (!loadFonts())
 		return false;
-	}
 
 	//check if a JoyStick is present
 	if (SDL_NumJoysticks() > 0)
@@ -96,9 +90,12 @@ bool Display::ShutDown()
 	SDL_JoystickClose(Display::gameController);
 	Display::gameController = nullptr;
 
-	//Free font
-	TTF_CloseFont(Display::font);
-	Display::font = nullptr;
+	//Free fonts
+	for (const std::pair<FontSize, TTF_Font*>& font : Display::fonts)
+	{
+		TTF_CloseFont(font.second);
+	}
+	Display::fonts.clear();
 
 	//Destroy window	
 	SDL_DestroyRenderer(Display::renderer);
@@ -146,7 +143,7 @@ void Display::InjectFrame()
 		if (!it->isVisible)
 			continue;
 
-		Texture* t = Texture::CreateFromText(it->text, it->textColor);
+		Texture* t = Texture::CreateFromText(it->text, it->textColor, it->fontsize);
 		
 		if(t)
 			t->Draw(it->x, it->y);
@@ -173,15 +170,15 @@ void Display::QueueTextureForRendering(Texture* const texture, int x, int y)
 	Display::textureQueue.push_back({ texture, x, y });
 }
 
-TTF_Font* const Display::GetFont()
+TTF_Font* const Display::GetFont(FontSize size)
 {
-	return Display::font;
+	return Display::fonts[size];
 }
 
-int Display::CreateText(std::string text, int x, int y, SDL_Color textColor /*= { 0, 0, 0 }*/)
+int Display::CreateText(std::string text, int x, int y, Display::FontSize fontSize, SDL_Color textColor /*= { 0, 0, 0 }*/)
 {
 	int id = Display::textControlIdCounter++;
-	Display::textQueue.push_back(QueuedText{ x, y, text, textColor, true, id });
+	Display::textQueue.push_back(QueuedText{ x, y, text, textColor, fontSize, true, id });
 	return id;
 }
 
@@ -244,11 +241,32 @@ bool Display::RemoveText(int id)
 
 #pragma endregion
 
+#pragma region Private Methods
+bool Display::loadFonts()
+{
+	std::vector<FontSize> fontsizesToLoad = { TWENTY, THIRTYFOUR };
+
+	for (int i = 0; i < fontsizesToLoad.size(); i++)
+	{
+		FontSize size = fontsizesToLoad[i];
+
+		Display::fonts[size] = TTF_OpenFont(FONT_FILEPATH, size);
+		if (Display::fonts[size] == nullptr)
+		{
+			printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
+			return false;
+		}
+	}
+
+	return true;
+}
+#pragma endregion
+
 #pragma region Static Member Initialization
 
 SDL_Window* Display::window = nullptr;
 SDL_Renderer* Display::renderer = nullptr;
-TTF_Font* Display::font;
+std::map<Display::FontSize, TTF_Font*> Display::fonts;
 std::function<void(SDL_Event e)> Display::eventCallback;
 SDL_Joystick* Display::gameController = nullptr;
 std::vector<Display::QueuedTexture> Display::textureQueue;

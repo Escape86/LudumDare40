@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include "Display.h"
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 
@@ -42,12 +41,12 @@ Texture::~Texture()
 	}
 }
 
-Texture* Texture::CreateFromText(const std::string text, SDL_Color textColor)
+Texture* Texture::CreateFromText(const std::string text, SDL_Color textColor, Display::FontSize fontSize)
 {
 	Texture* t = new Texture();
 
 	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderText_Solid(Display::GetFont(), text.c_str(), textColor);
+	SDL_Surface* textSurface = TTF_RenderText_Solid(Display::GetFont(fontSize), text.c_str(), textColor);
 	if (textSurface == nullptr)
 	{
 		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());

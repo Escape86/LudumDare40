@@ -25,8 +25,8 @@ Game::Game()
 	this->player->SetMaxOrbCount(this->currentLevel->GetOrbCapacityForThisLevel());
 
 	//create text controls for the UI
-	playerOrbCountTextId = Display::CreateText("", SCREEN_WIDTH - 62, 2, BLACK);
-	playerHpTextId = Display::CreateText("", 2, 2, BLACK);
+	playerOrbCountTextId = Display::CreateText("", SCREEN_WIDTH - 62, 2, Display::FontSize::TWENTY, BLACK);
+	playerHpTextId = Display::CreateText("", 2, 2, Display::FontSize::TWENTY, BLACK);
 }
 
 #pragma endregion
