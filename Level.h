@@ -12,6 +12,8 @@ class Level
 public:
 	static Level* Load(int levelNumber);
 
+	void InjectFrame(unsigned int elapsedGameTimeInMilliseconds);
+
 	std::vector<Enemy*>& GetEnemies();
 	std::vector<AreaTrigger*>& GetShrines();
 
@@ -23,4 +25,11 @@ private:
 
 	std::vector<Enemy*> enemies;
 	std::vector<AreaTrigger*> areaTriggers;
+
+	struct QueuedEnemy
+	{
+		unsigned int spawnTime;	//in ms
+		Enemy* enemy;
+	};
+	std::vector<QueuedEnemy> queuedEnemies;
 };

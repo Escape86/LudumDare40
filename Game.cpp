@@ -40,6 +40,9 @@ Game::~Game()
 
 void Game::InjectFrame()
 {
+	Uint32 elapsedTimeInMilliseconds = SDL_GetTicks();
+	this->currentLevel->InjectFrame(elapsedTimeInMilliseconds);
+
 	std::vector<AreaTrigger*>& shrines = this->currentLevel->GetShrines();
 	std::vector<Enemy*>& enemies = this->currentLevel->GetEnemies();
 
