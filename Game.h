@@ -1,11 +1,8 @@
 #pragma once
 
-#include <vector>
-
 #pragma region Forward Declarations
 class Player;
-class Enemy;
-class AreaTrigger;
+class Level;
 #pragma endregion
 
 class Game
@@ -17,12 +14,11 @@ public:
 	void InjectFrame();
 	void InjectKeyDown(int key);
 	void InjectKeyUp(int key);
-	void InjectControllerStickMovement(uint8_t axis, int16_t value);
+	void InjectControllerStickMovement(unsigned char axis, short value);
 
 private:
 	Player* player;
-	std::vector<Enemy*> enemies;
-	std::vector<AreaTrigger*> areaTriggers;
+	Level* currentLevel;
 
 	int playerElementStrengthTextId;
 	int playerHpTextId;

@@ -4,7 +4,7 @@
 
 #pragma region Constructor
 
-Object::Object(int x, int y, std::string texturePath, ElementType type)
+Object::Object(double x, double y, std::string texturePath, ElementType type)
 {
 	this->x = x;
 	this->y = y;

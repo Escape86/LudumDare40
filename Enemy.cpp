@@ -20,23 +20,42 @@ Enemy::~Enemy()
 
 void Enemy::InjectFrame()
 {
-	if (this->x > this->targetX)
+	double x1 = this->x;
+	double x2 = this->targetX;
+	double y1 = this->y;
+	double y2 = this->targetY;
+
+	double xDistance = x2 - x1;
+	double yDistance = y2 - y1;
+
+	double xRatio;
+	double yRatio;
+
+	//which direction do we need to move the farthest in?
+	if (xDistance > yDistance)
 	{
-		this->x -= ENEMY_VELOCITY;
+		xRatio = this->x > targetX ? -1.0 : 1.0;
+		yRatio = yDistance / xDistance;
 	}
-	else if (this->x < this->targetX)
+	else
 	{
-		this->x += ENEMY_VELOCITY;
+		xRatio = xDistance / yDistance;
+		yRatio = this->y > targetY ? -1.0 : 1.0;
 	}
 
-	if (this->y > this->targetY)
+	if (xRatio > ENEMY_VELOCITY)
 	{
-		this->y -= ENEMY_VELOCITY;
+		yRatio = yRatio / xRatio;
+		xRatio = 1.0;
 	}
-	else if (this->y < this->targetY)
+	else if (yRatio > ENEMY_VELOCITY)
 	{
-		this->y += ENEMY_VELOCITY;
+		xRatio = xRatio / yRatio;
+		yRatio = 1.0;
 	}
+
+	this->x += (xRatio * ENEMY_VELOCITY);
+	this->y += (yRatio * ENEMY_VELOCITY);
 }
 
 #pragma endregion

@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Level.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "AreaTrigger.h"
@@ -9,25 +10,18 @@
 
 Game::Game()
 {
+	//create the player object
 	this->player = new Player();
 
-	const int waterShrineX = SCREEN_WIDTH / 2;
-	const int waterShrineY = 40;
-	const int fireShrineX = 40;
-	const int fireShrineY = SCREEN_HEIGHT - 40;
-	const int plantShrineX = SCREEN_WIDTH - 40;
-	const int plantShrineY = SCREEN_HEIGHT - 40;
+	//load level 1
+	this->currentLevel = Level::Load(1);
 
-	this->areaTriggers.push_back(new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER));
-	this->areaTriggers.push_back(new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE));
-	this->areaTriggers.push_back(new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT));
+	if (this->currentLevel == nullptr)
+	{
+		printf("Failed to load level1!\n");
+	}
 
-	this->enemies.push_back(new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
-	this->enemies.push_back(new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
-	this->enemies.push_back(new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
-	this->enemies.push_back(new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
-	this->enemies.push_back(new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
-
+	//create text controls for the UI
 	playerElementStrengthTextId = Display::CreateText("x0", SCREEN_WIDTH - 35, 2, BLACK);
 	playerHpTextId = Display::CreateText("100%", 2, 2, BLACK);
 }
@@ -42,23 +36,14 @@ Game::~Game()
 	{
 		delete this->player;
 	}
-
-	for (Enemy* e : this->enemies)
-	{
-		delete e;
-	}
-	this->enemies.clear();
-
-	for (AreaTrigger* at : this->areaTriggers)
-	{
-		delete at;
-	}
-	this->areaTriggers.clear();
 }
 
 void Game::InjectFrame()
 {
-	for (Enemy* const enemy : this->enemies)
+	std::vector<AreaTrigger*>& shrines = this->currentLevel->GetShrines();
+	std::vector<Enemy*>& enemies = this->currentLevel->GetEnemies();
+
+	for (Enemy* const enemy : enemies)
 	{
 		enemy->InjectFrame();
 	}
@@ -66,7 +51,7 @@ void Game::InjectFrame()
 	this->player->InjectFrame();
 
 	//now that movements are updated check for collisions
-	for (std::vector<Enemy*>::iterator it = this->enemies.begin(); it != this->enemies.end();)
+	for (std::vector<Enemy*>::iterator it = enemies.begin(); it != enemies.end();)
 	{
 		bool enemyCollision = false;
 
@@ -77,9 +62,9 @@ void Game::InjectFrame()
 			this->player->HandleElementCollision(enemy->GetElementType());
 		}
 
-		for (AreaTrigger* const at : this->areaTriggers)
+		for (AreaTrigger* const shrine : shrines)
 		{
-			if (at->TestCollision(enemy))
+			if (shrine->TestCollision(enemy))
 			{
 				//enemy reach an area trigger
 				this->player->SetHp(this->player->GetHp() - 1);
@@ -89,7 +74,7 @@ void Game::InjectFrame()
 
 		if (enemyCollision)
 		{
-			it = this->enemies.erase(it);
+			it = enemies.erase(it);
 		}
 		else
 		{
@@ -98,13 +83,13 @@ void Game::InjectFrame()
 	}
 
 	//draw area triggers
-	for (AreaTrigger* const at : this->areaTriggers)
+	for (AreaTrigger* const at : shrines)
 	{
 		at->Draw();
 	}
 
 	//draw enemies
-	for (Enemy* const enemy : this->enemies)
+	for (Enemy* const enemy : enemies)
 	{
 		enemy->Draw();
 	}
@@ -132,7 +117,7 @@ void Game::InjectKeyUp(int key)
 	this->player->OnKeyUp(key);
 }
 
-void Game::InjectControllerStickMovement(uint8_t axis, int16_t value)
+void Game::InjectControllerStickMovement(unsigned char axis, short value)
 {
 	//X axis motion
 	if (axis == 0)

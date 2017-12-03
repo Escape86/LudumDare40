@@ -10,7 +10,7 @@ class Texture;
 class Object
 {
 public:
-	Object(int x, int y, std::string texturePath, ElementType type);
+	Object(double x, double y, std::string texturePath, ElementType type);
 	virtual ~Object();
 
 	virtual void InjectFrame() = 0;
@@ -22,8 +22,8 @@ public:
 	ElementType GetElementType();
 
 protected:
-	int x;
-	int y;
+	double x;
+	double y;
 	int width;
 	int height;
 
