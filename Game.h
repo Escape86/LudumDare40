@@ -16,6 +16,8 @@ public:
 	void InjectKeyUp(int key);
 	void InjectControllerStickMovement(unsigned char axis, short value);
 
+	void LoadLevel(int levelNumber);
+
 private:
 	Player* player;
 	Level* currentLevel;

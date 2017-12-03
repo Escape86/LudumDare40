@@ -12,21 +12,26 @@ class Level
 {
 public:
 	static Level* Load(int levelNumber);
+	
+	~Level();
 
 	void InjectFrame(unsigned int elapsedGameTimeInMilliseconds);
+	void InjectKeyPress();
 
 	std::vector<Enemy*>& GetEnemies();
 	std::vector<AreaTrigger*>& GetShrines();
 
 	const int GetOrbCapacityForThisLevel();
+	const int GetLevelNumber();
+
+	bool ShouldAdvanceLevel();
 
 private:
 	static Level* createLevel1();
 	static Level* createLevel2();
 	static Level* createLevel3();
 
-	Level(int orbCapcityForThisLevel);
-	~Level();
+	Level(int levelNumber, int orbCapcityForThisLevel);
 
 	std::vector<Enemy*> enemies;
 	std::vector<AreaTrigger*> areaTriggers;
@@ -38,6 +43,7 @@ private:
 	};
 	std::vector<QueuedEnemy> queuedEnemies;
 
+	const int levelNumber;
 	const int orbCapacityForPlayer;
 
 	struct QueuedText
@@ -52,4 +58,6 @@ private:
 		int idFromCreation;
 	};
 	std::vector<QueuedText> queuedText;
+
+	bool shouldAdvanceLevel;
 };

@@ -61,6 +61,12 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 	}
 }
 
+void Level::InjectKeyPress()
+{
+	if (this->levelNumber == 1)
+		shouldAdvanceLevel = true;
+}
+
 std::vector<Enemy*>& Level::GetEnemies()
 {
 	return this->enemies;
@@ -76,14 +82,24 @@ const int Level::GetOrbCapacityForThisLevel()
 	return this->orbCapacityForPlayer;
 }
 
+const int Level::GetLevelNumber()
+{
+	return this->levelNumber;
+}
+
+bool Level::ShouldAdvanceLevel()
+{
+	return this->shouldAdvanceLevel;
+}
+
 #pragma endregion
 
 #pragma region Private Methods
 
 #pragma region Constructor
-Level::Level(int orbCapcityForThisLevel) : orbCapacityForPlayer(orbCapcityForThisLevel)
+Level::Level(int levelNumber, int orbCapcityForThisLevel) : levelNumber(levelNumber), orbCapacityForPlayer(orbCapcityForThisLevel)
 {
-
+	shouldAdvanceLevel = false;
 }
 #pragma endregion
 
@@ -100,18 +116,48 @@ Level::~Level()
 		delete at;
 	}
 	this->areaTriggers.clear();
+
+	for (QueuedEnemy& qe : this->queuedEnemies)
+	{
+		delete qe.enemy;
+	}
+	this->queuedEnemies.clear();
+
+	for (QueuedText& qt : this->queuedText)
+	{
+		if(qt.isBeingShown)
+		{
+			Display::RemoveText(qt.idFromCreation);
+		}
+	}
+	this->queuedText.clear();
 }
 
 Level* Level::createLevel1()
 {
-	Level* l = new Level(5);
-	l->queuedText.push_back({ 100, 100, "Welcome to Elemental Balance", 500, -1, Display::FontSize::THIRTYFOUR, false, -1});
+	const int LEVEL_NUMBER = 1;
+
+	const int whenToShowStory = 1750;
+
+	Level* l = new Level(LEVEL_NUMBER, 5);
+	l->queuedText.push_back({ 100, 100, "Welcome to Elemental Balance", 0, -1, Display::FontSize::THIRTYFOUR, false, -1});
+
+	l->queuedText.push_back({ 50, 200, "For as long as time can tell, the world has been in peace and",		whenToShowStory,		-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 50, 225, "harmony. This is thanks to the balance of the three elements",		whenToShowStory + 250,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 50, 250, "of creation: Fire, Water, and Earth. However, something has",		whenToShowStory + 500,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 50, 275, "disturbed the eternal harmony of the world and the elements are",	whenToShowStory + 750,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 50, 300, "fighting amongst themselves. Please help restore balance to the",	whenToShowStory + 1000, -1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 50, 325, "elements so that our world may continue to thrive in tranquility.", whenToShowStory + 1250, -1, Display::FontSize::TWENTY, false, -1 });
+
+	l->queuedText.push_back({ 250, 450, "Press any key to continue...",										whenToShowStory + 3000, -1, Display::FontSize::TWENTY, false, -1 });
 	return l;
 }
 
 Level* Level::createLevel2()
 {
-	Level* l = new Level(5);
+	const int LEVEL_NUMBER = 2;
+
+	Level* l = new Level(LEVEL_NUMBER, 5);
 
 	const int waterShrineX = SCREEN_WIDTH / 2;
 	const int waterShrineY = SCREEN_HEIGHT - 40;
@@ -124,7 +170,9 @@ Level* Level::createLevel2()
 
 Level* Level::createLevel3()
 {
-	Level* l = new Level(5);
+	const int LEVEL_NUMBER = 3;
+
+	Level* l = new Level(LEVEL_NUMBER, 5);
 
 	const int waterShrineX = SCREEN_WIDTH / 2;
 	const int waterShrineY = 40;

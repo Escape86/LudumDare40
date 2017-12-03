@@ -10,23 +10,11 @@
 
 Game::Game()
 {
-	//create the player object
-	this->player = new Player();
+	playerOrbCountTextId = -1;
+	playerHpTextId = -1;
 
-	//load level 1
-	this->currentLevel = Level::Load(1);
-
-	if (this->currentLevel == nullptr)
-	{
-		printf("Failed to load level1!\n");
-	}
-
-	//set player's orb capacity
-	this->player->SetMaxOrbCount(this->currentLevel->GetOrbCapacityForThisLevel());
-
-	//create text controls for the UI
-	playerOrbCountTextId = Display::CreateText("", SCREEN_WIDTH - 62, 2, Display::FontSize::TWENTY, BLACK);
-	playerHpTextId = Display::CreateText("", 2, 2, Display::FontSize::TWENTY, BLACK);
+	//setup first level
+	this->LoadLevel(1);
 }
 
 #pragma endregion
@@ -54,7 +42,8 @@ void Game::InjectFrame()
 		enemy->InjectFrame();
 	}
 
-	this->player->InjectFrame();
+	if(this->player)
+		this->player->InjectFrame();
 
 	//now that movements are updated check for collisions
 	for (std::vector<Enemy*>::iterator it = enemies.begin(); it != enemies.end();)
@@ -100,27 +89,39 @@ void Game::InjectFrame()
 		enemy->Draw();
 	}
 
-	//draw player
-	this->player->Draw();
+	if (this->player)
+	{
+		//draw player
+		this->player->Draw();
 
-	//update text controls
-	char hpText[8];
-	sprintf_s(hpText, "%d%%", this->player->GetHp());
-	Display::UpdateText(this->playerHpTextId, hpText);
+		//update text controls
+		char hpText[8];
+		sprintf_s(hpText, "%d%%", this->player->GetHp());
+		Display::UpdateText(this->playerHpTextId, hpText);
 
-	char orbCountText[8];
-	sprintf_s(orbCountText, "x%d/%d", this->player->GetOrbCount(), this->player->GetMaxOrbCount());
-	Display::UpdateText(this->playerOrbCountTextId, orbCountText);
+		char orbCountText[8];
+		sprintf_s(orbCountText, "x%d/%d", this->player->GetOrbCount(), this->player->GetMaxOrbCount());
+		Display::UpdateText(this->playerOrbCountTextId, orbCountText);
+	}
+
+	if (this->currentLevel->ShouldAdvanceLevel())
+	{
+		this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
+	}
 }
 
 void Game::InjectKeyDown(int key)
 {
-	this->player->OnKeyDown(key);
+	this->currentLevel->InjectKeyPress();
+
+	if(this->player)
+		this->player->OnKeyDown(key);
 }
 
 void Game::InjectKeyUp(int key)
 {
-	this->player->OnKeyUp(key);
+	if(this->player)
+		this->player->OnKeyUp(key);
 }
 
 void Game::InjectControllerStickMovement(unsigned char axis, short value)
@@ -164,6 +165,47 @@ void Game::InjectControllerStickMovement(unsigned char axis, short value)
 		{
 			this->player->ResetVerticalVelocity();
 		}
+	}
+}
+
+void Game::LoadLevel(int levelNumber)
+{
+	//clear previous level stuff
+	if (playerOrbCountTextId >= 0)
+	{
+		Display::RemoveText(playerOrbCountTextId);
+		playerOrbCountTextId = -1;
+	}
+
+	if (playerHpTextId >= 0)
+	{
+		Display::RemoveText(playerHpTextId);
+		playerHpTextId = -1;
+	}
+
+	delete this->currentLevel;
+
+	//load in new level
+	this->currentLevel = Level::Load(levelNumber);
+
+	if (this->currentLevel == nullptr)
+	{
+		printf("Failed to load level1!\n");
+		return;
+	}
+
+	//skip gameplay stuff for level 1 since it's just the titlescreen
+	if (levelNumber != 1)
+	{
+		//create the player object
+		this->player = new Player();
+
+		//set player's orb capacity
+		this->player->SetMaxOrbCount(this->currentLevel->GetOrbCapacityForThisLevel());
+
+		//create text controls for the UI
+		playerOrbCountTextId = Display::CreateText("", SCREEN_WIDTH - 62, 2, Display::FontSize::TWENTY, BLACK);
+		playerHpTextId = Display::CreateText("", 2, 2, Display::FontSize::TWENTY, BLACK);
 	}
 }
 

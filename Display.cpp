@@ -140,7 +140,7 @@ void Display::InjectFrame()
 
 	for (std::vector<QueuedText>::iterator it = Display::textQueue.begin(); it != Display::textQueue.end(); ++it)
 	{
-		if (!it->isVisible)
+		if (!it->isVisible || it->text.empty())
 			continue;
 
 		Texture* t = Texture::CreateFromText(it->text, it->textColor, it->fontsize);
