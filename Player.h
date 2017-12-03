@@ -8,6 +8,8 @@ public:
 	Player();
 	~Player();
 
+	void Draw() override;
+
 	void InjectFrame() override;
 	void OnKeyDown(int key);
 	void OnKeyUp(int key);
@@ -28,4 +30,6 @@ private:
 
 	int elementStrength;
 	int hp;
+
+	Texture* overlayTexture;
 };

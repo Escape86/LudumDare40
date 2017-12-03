@@ -5,13 +5,20 @@
 
 #pragma region Constructor
 
-Player::Player() : Object(0, 0, BLACK_DOT_TEXTURE_PATH, ElementType::NONE)
+Player::Player() : Object(10, 10, BLACK_DOT_TEXTURE_PATH, ElementType::NONE)
 {
 	this->horizontalVelocity = 0;
 	this->verticalVelocity = 0;
 
 	this->elementStrength = 0;
 	this->hp = 100;
+
+	this->overlayTexture = new Texture(PLAYER_OVERLAY_TEXTURE_PATH);
+	this->overlayTexture->Load();
+
+	//TODO: pulling this from texture size is probably not ideal
+	this->width = this->overlayTexture->GetWidth();
+	this->height = this->overlayTexture->GetHeight();
 }
 
 #pragma endregion
@@ -20,7 +27,19 @@ Player::Player() : Object(0, 0, BLACK_DOT_TEXTURE_PATH, ElementType::NONE)
 
 Player::~Player()
 {
+	if (this->overlayTexture)
+	{
+		delete this->overlayTexture;
+	}
+}
 
+void Player::Draw()
+{
+	//draw the standard orb
+	Object::Draw();
+
+	//draw the custom overlay to help the player standout from other orbs
+	Display::QueueTextureForRendering(this->overlayTexture, this->x, this->y);
 }
 
 void Player::InjectFrame()
@@ -30,11 +49,26 @@ void Player::InjectFrame()
 	this->y += this->verticalVelocity;
 
 	//enforce screen bounds
-	if (this->x < 0 || this->x + this->width > SCREEN_WIDTH)
-		this->x -= this->horizontalVelocity;
+	int halfWidth = this->width / 2;
+	int halfHeight = this->height / 2;
 
-	if (this->y < 0 || this->y + this->height > SCREEN_HEIGHT)
-		this->y -= this->verticalVelocity;
+	if (this->x - halfWidth < 0)
+	{
+		this->x = halfWidth;
+	}
+	else if (this->x + halfWidth > SCREEN_WIDTH)
+	{
+		this->x = SCREEN_WIDTH - halfWidth;
+	}
+
+	if (this->y - halfHeight < 0)
+	{
+		this->y = halfHeight;
+	}
+	else if (this->y + halfHeight > SCREEN_HEIGHT)
+	{
+		this->y = SCREEN_HEIGHT - halfHeight;
+	}
 }
 
 void Player::OnKeyDown(int key)

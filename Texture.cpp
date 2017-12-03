@@ -17,6 +17,7 @@ Texture::Texture(const std::string path)
 {
 	this->path = path;
 	this->isLoaded = false;
+	this->isForText = false;
 }
 
 Texture::Texture()
@@ -69,6 +70,7 @@ Texture* Texture::CreateFromText(const std::string text, SDL_Color textColor)
 	SDL_FreeSurface(textSurface);
 
 	t->isLoaded = true;
+	t->isForText = true;
 
 	return t;
 }
@@ -123,7 +125,9 @@ void Texture::Draw(int x, int y, SDL_Rect* clip /*= nullptr*/, double angle /*= 
 	assert(this->isLoaded);
 
 	//Set rendering space and render to screen
-	SDL_Rect renderQuad = { x, y, this->width, this->height };
+	int renderX = this->isForText ? x : x - (this->width / 2);
+	int renderY = this->isForText ? y : y - (this->height / 2);
+	SDL_Rect renderQuad = { renderX, renderY, this->width, this->height };
 
 	//Set clip rendering dimensions
 	if (clip != nullptr)

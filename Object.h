@@ -15,7 +15,7 @@ public:
 
 	virtual void InjectFrame() = 0;
 
-	void Draw();
+	virtual void Draw();
 
 	bool TestCollision(Object* otherObject);
 	void SetTexture(std::string texturePath);

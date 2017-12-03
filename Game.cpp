@@ -11,13 +11,13 @@ Game::Game()
 {
 	this->player = new Player();
 
-	this->enemies.push_back(new Enemy(0, 100, 0, 100, ElementType::PLANT));
-	this->enemies.push_back(new Enemy(0, 200, 0, 200, ElementType::WATER));
-	this->enemies.push_back(new Enemy(0, 300, 0, 300, ElementType::FIRE));
-	this->enemies.push_back(new Enemy(0, 400, 0, 400, ElementType::PLANT));
-	this->enemies.push_back(new Enemy(0, 450, 0, 450, ElementType::WATER));
-	this->enemies.push_back(new Enemy(0, 500, 0, 500, ElementType::FIRE));
-	this->enemies.push_back(new Enemy(0, 550, 0, 550, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(10, 100, 10, 100, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(10, 200, 10, 200, ElementType::WATER));
+	this->enemies.push_back(new Enemy(10, 300, 10, 300, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(10, 400, 10, 400, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(10, 450, 10, 450, ElementType::WATER));
+	this->enemies.push_back(new Enemy(10, 500, 10, 500, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(10, 550, 10, 550, ElementType::PLANT));
 
 	this->enemies.push_back(new Enemy(500, 100, 500, 100, ElementType::FIRE));
 	this->enemies.push_back(new Enemy(500, 200, 500, 200, ElementType::WATER));

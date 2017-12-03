@@ -4,11 +4,12 @@
 #define BLUE_CIRCLE_TEXTURE_PATH	"resources/Shrine_Water.png"
 #define BLUE_DOT_TEXTURE_PATH		"resources/Orb_Water.png"
 #define BLACK_CIRCLE_TEXTURE_PATH	"resources/black_circle.bmp"
-#define BLACK_DOT_TEXTURE_PATH		"resources/black_dot.bmp"
+#define BLACK_DOT_TEXTURE_PATH		"resources/Orb_Neutral.png"
 #define GREEN_CIRCLE_TEXTURE_PATH	"resources/Shrine_Plant.png"
 #define GREEN_DOT_TEXTURE_PATH		"resources/Orb_Plant.png"
 #define RED_CIRCLE_TEXTURE_PATH		"resources/Shrine_Fire.png"
 #define RED_DOT_TEXTURE_PATH		"resources/Orb_Fire.png"
+#define PLAYER_OVERLAY_TEXTURE_PATH	"resources/PlayerOverlay.png"
 #define FONT_FILEPATH				"resources/lazy.ttf"
 #pragma endregion
 

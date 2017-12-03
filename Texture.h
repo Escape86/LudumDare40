@@ -24,6 +24,7 @@ private:
 	int width;
 	int height;
 	std::string path;
+	bool isForText;
 
 	SDL_Texture* sdl_texture;
 };
