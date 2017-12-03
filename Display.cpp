@@ -7,7 +7,7 @@
 #include <SDL_ttf.h>
 #include <iostream>
 
-const int fontSize = 24;
+const int fontSize = 20;
 
 #pragma region Public Methods
 

@@ -10,7 +10,7 @@
 #define RED_CIRCLE_TEXTURE_PATH		"resources/Shrine_Fire.png"
 #define RED_DOT_TEXTURE_PATH		"resources/Orb_Fire.png"
 #define PLAYER_OVERLAY_TEXTURE_PATH	"resources/PlayerOverlay.png"
-#define FONT_FILEPATH				"resources/lazy.ttf"
+#define FONT_FILEPATH				"resources/Fonts/Orbitron/Orbitron-Regular.ttf"
 #pragma endregion
 
 #pragma region Colors

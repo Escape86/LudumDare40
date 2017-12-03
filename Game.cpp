@@ -11,28 +11,25 @@ Game::Game()
 {
 	this->player = new Player();
 
-	this->enemies.push_back(new Enemy(10, 100, 10, 100, ElementType::PLANT));
-	this->enemies.push_back(new Enemy(10, 200, 10, 200, ElementType::WATER));
-	this->enemies.push_back(new Enemy(10, 300, 10, 300, ElementType::FIRE));
-	this->enemies.push_back(new Enemy(10, 400, 10, 400, ElementType::PLANT));
-	this->enemies.push_back(new Enemy(10, 450, 10, 450, ElementType::WATER));
-	this->enemies.push_back(new Enemy(10, 500, 10, 500, ElementType::FIRE));
-	this->enemies.push_back(new Enemy(10, 550, 10, 550, ElementType::PLANT));
+	const int waterShrineX = SCREEN_WIDTH / 2;
+	const int waterShrineY = 40;
+	const int fireShrineX = 40;
+	const int fireShrineY = SCREEN_HEIGHT - 40;
+	const int plantShrineX = SCREEN_WIDTH - 40;
+	const int plantShrineY = SCREEN_HEIGHT - 40;
 
-	this->enemies.push_back(new Enemy(500, 100, 500, 100, ElementType::FIRE));
-	this->enemies.push_back(new Enemy(500, 200, 500, 200, ElementType::WATER));
-	this->enemies.push_back(new Enemy(500, 300, 500, 300, ElementType::PLANT));
-	this->enemies.push_back(new Enemy(500, 400, 500, 400, ElementType::FIRE));
-	this->enemies.push_back(new Enemy(500, 450, 500, 450, ElementType::WATER));
-	this->enemies.push_back(new Enemy(500, 500, 500, 500, ElementType::PLANT));
-	this->enemies.push_back(new Enemy(500, 550, 500, 550, ElementType::WATER));
+	this->areaTriggers.push_back(new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER));
+	this->areaTriggers.push_back(new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE));
+	this->areaTriggers.push_back(new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT));
 
-	this->areaTriggers.push_back(new AreaTrigger(250, 300, ElementType::WATER));
-	this->areaTriggers.push_back(new AreaTrigger(250, 400, ElementType::FIRE));
-	this->areaTriggers.push_back(new AreaTrigger(250, 500, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
+	this->enemies.push_back(new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
+	this->enemies.push_back(new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
+	this->enemies.push_back(new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
+	this->enemies.push_back(new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER));
 
-	playerElementStrengthTextId = Display::CreateText("x0", SCREEN_WIDTH - 25, 0, BLACK);
-	playerHpTextId = Display::CreateText("100%", 0, 0, BLACK);
+	playerElementStrengthTextId = Display::CreateText("x0", SCREEN_WIDTH - 35, 2, BLACK);
+	playerHpTextId = Display::CreateText("100%", 2, 2, BLACK);
 }
 
 #pragma endregion

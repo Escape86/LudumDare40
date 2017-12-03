@@ -5,7 +5,7 @@
 
 #pragma region Constructor
 
-Player::Player() : Object(10, 10, BLACK_DOT_TEXTURE_PATH, ElementType::NONE)
+Player::Player() : Object((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), BLACK_DOT_TEXTURE_PATH, ElementType::NONE)
 {
 	this->horizontalVelocity = 0;
 	this->verticalVelocity = 0;
