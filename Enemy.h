@@ -5,7 +5,7 @@
 class Enemy : public Object
 {
 public:
-	Enemy(int x, int y, int targetX, int targetY, ElementType type);
+	Enemy(double x, double y, int targetX, int targetY, ElementType type);
 	~Enemy();
 
 	void InjectFrame() override;

@@ -3,7 +3,7 @@
 
 #pragma region Constructor
 
-Enemy::Enemy(int x, int y, int targetX, int targetY, ElementType type) : Object(x, y, ELEMENTTYPE_TO_DOT_TEXTURE[type], type)
+Enemy::Enemy(double x, double y, int targetX, int targetY, ElementType type) : Object(x, y, ELEMENTTYPE_TO_DOT_TEXTURE[type], type)
 {
 	this->targetX = targetX;
 	this->targetY = targetY;
@@ -27,6 +27,9 @@ void Enemy::InjectFrame()
 
 	double xDistance = x2 - x1;
 	double yDistance = y2 - y1;
+
+	if (xDistance == 0 && yDistance == 0)
+		return;
 
 	double xRatio;
 	double yRatio;
