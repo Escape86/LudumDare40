@@ -23,4 +23,7 @@ private:
 	Player* player;
 	std::vector<Enemy*> enemies;
 	std::vector<AreaTrigger*> areaTriggers;
+
+	int playerElementStrengthTextId;
+	int playerHpTextId;
 };

@@ -7,7 +7,7 @@
 #include <SDL_ttf.h>
 #include <iostream>
 
-const int fontSize = 18;
+const int fontSize = 24;
 
 #pragma region Public Methods
 
@@ -171,16 +171,6 @@ SDL_Renderer* const Display::GetRenderer()
 void Display::QueueTextureForRendering(Texture* const texture, int x, int y)
 {
 	Display::textureQueue.push_back({ texture, x, y });
-}
-
-int Display::GetScreenWidth()
-{
-	return SCREEN_WIDTH;
-}
-
-int Display::GetScreenHeight()
-{
-	return SCREEN_HEIGHT;
 }
 
 TTF_Font* const Display::GetFont()

@@ -18,4 +18,5 @@ void AreaTrigger::InjectFrame()
 {
 
 }
+
 #pragma endregion

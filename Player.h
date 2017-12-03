@@ -15,9 +15,17 @@ public:
 	void ResetHorizontalVelocity();
 	void ResetVerticalVelocity();
 
-	void SetElementType(ElementType type);
+	void HandleElementCollision(ElementType typeFromCollision);
+	int GetElementStrength();
+	void SetElementStrength(int value);
+
+	int GetHp();
+	void SetHp(int hp);
 
 private:
 	int horizontalVelocity;
 	int verticalVelocity;
+
+	int elementStrength;
+	int hp;
 };

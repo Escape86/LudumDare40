@@ -16,3 +16,10 @@ std::map<ElementType, const char*> ELEMENTTYPE_TO_DOT_TEXTURE =
 	{ FIRE,  RED_DOT_TEXTURE_PATH   },
 	{ PLANT, GREEN_DOT_TEXTURE_PATH }
 };
+
+std::map<ElementType, ElementType> ELEMENTTYPE_WEAKNESS =
+{
+	{ WATER, PLANT },
+	{ FIRE,  WATER },
+	{ PLANT, FIRE  }
+};

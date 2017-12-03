@@ -24,9 +24,6 @@ public:
 	static SDL_Renderer* const GetRenderer();
 	static void QueueTextureForRendering(Texture* const texture, int x, int y);
 
-	static int GetScreenWidth();
-	static int GetScreenHeight();
-
 	static TTF_Font* const GetFont();
 
 	struct QueuedText

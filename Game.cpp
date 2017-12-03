@@ -5,26 +5,34 @@
 #include "Display.h"
 #include "Constants.h"
 
-int debug_enemy_collision_text_id = -1;
-int debug_areatrigger_collision_text_id = -1;
-
 #pragma region Constructor
 
 Game::Game()
 {
 	this->player = new Player();
 
-	this->enemies.push_back(new Enemy(10, 25, 500, 500, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(0, 100, 0, 100, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(0, 200, 0, 200, ElementType::WATER));
+	this->enemies.push_back(new Enemy(0, 300, 0, 300, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(0, 400, 0, 400, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(0, 450, 0, 450, ElementType::WATER));
+	this->enemies.push_back(new Enemy(0, 500, 0, 500, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(0, 550, 0, 550, ElementType::PLANT));
 
-	this->areaTriggers.push_back(new AreaTrigger(100, 100, ElementType::WATER));
-	this->areaTriggers.push_back(new AreaTrigger(500, 500, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(500, 100, 500, 100, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(500, 200, 500, 200, ElementType::WATER));
+	this->enemies.push_back(new Enemy(500, 300, 500, 300, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(500, 400, 500, 400, ElementType::FIRE));
+	this->enemies.push_back(new Enemy(500, 450, 500, 450, ElementType::WATER));
+	this->enemies.push_back(new Enemy(500, 500, 500, 500, ElementType::PLANT));
+	this->enemies.push_back(new Enemy(500, 550, 500, 550, ElementType::WATER));
+
+	this->areaTriggers.push_back(new AreaTrigger(250, 300, ElementType::WATER));
+	this->areaTriggers.push_back(new AreaTrigger(250, 400, ElementType::FIRE));
 	this->areaTriggers.push_back(new AreaTrigger(250, 500, ElementType::PLANT));
 
-	debug_enemy_collision_text_id = Display::CreateText("Player Collision", 0, 0);
-	Display::SetTextIsVisible(debug_enemy_collision_text_id, false);
-
-	debug_areatrigger_collision_text_id = Display::CreateText("AreaTrigger Collision", 150, 0);
-	Display::SetTextIsVisible(debug_areatrigger_collision_text_id, false);
+	playerElementStrengthTextId = Display::CreateText("x0", SCREEN_WIDTH - 25, 0, BLACK);
+	playerHpTextId = Display::CreateText("100%", 0, 0, BLACK);
 }
 
 #pragma endregion
@@ -61,28 +69,36 @@ void Game::InjectFrame()
 	this->player->InjectFrame();
 
 	//now that movements are updated check for collisions
-	bool enemyCollision = false;
-	for (Enemy* const enemy : this->enemies)
+	for (std::vector<Enemy*>::iterator it = this->enemies.begin(); it != this->enemies.end();)
 	{
+		bool enemyCollision = false;
+
+		Enemy* enemy = *it;
 		if (this->player->TestCollision(enemy))
 		{
 			enemyCollision = true;
-			break;
+			this->player->HandleElementCollision(enemy->GetElementType());
 		}
-	}
-	Display::SetTextIsVisible(debug_enemy_collision_text_id, enemyCollision);
 
-	bool areaTriggerCollision = false;
-	for (AreaTrigger* const at : this->areaTriggers)
-	{
-		if (this->player->TestCollision(at))
+		for (AreaTrigger* const at : this->areaTriggers)
 		{
-			areaTriggerCollision = true;
-			this->player->SetElementType(at->GetElementType());
-			break;
+			if (at->TestCollision(enemy))
+			{
+				//enemy reach an area trigger
+				this->player->SetHp(this->player->GetHp() - 1);
+				enemyCollision = true;
+			}
+		}
+
+		if (enemyCollision)
+		{
+			it = this->enemies.erase(it);
+		}
+		else
+		{
+			++it;
 		}
 	}
-	Display::SetTextIsVisible(debug_areatrigger_collision_text_id, areaTriggerCollision);
 
 	//draw area triggers
 	for (AreaTrigger* const at : this->areaTriggers)
@@ -98,6 +114,15 @@ void Game::InjectFrame()
 
 	//draw player
 	this->player->Draw();
+
+	//update text controls
+	char hpText[8];
+	sprintf_s(hpText, "%d%%", this->player->GetHp());
+	Display::UpdateText(this->playerHpTextId, hpText);
+
+	char elementStrengthText[8];
+	sprintf_s(elementStrengthText, "x%d", this->player->GetElementStrength());
+	Display::UpdateText(this->playerElementStrengthTextId, elementStrengthText);
 }
 
 void Game::InjectKeyDown(int key)
