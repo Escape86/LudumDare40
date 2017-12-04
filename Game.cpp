@@ -15,7 +15,7 @@ Game::Game()
 	this->previousFrameEndTime = 0;
 
 	//setup first level
-	this->LoadLevel(1);
+	this->LoadLevel(0);
 }
 
 #pragma endregion
@@ -106,6 +106,7 @@ void Game::InjectFrame()
 		{
 			if (this->player->TestCollision(shrine))
 			{
+				this->currentLevel->InjectPlayerBroughtOrbToShrine(this->player->GetElementType(), shrine->GetElementType(), this->player->GetOrbCount());
 				this->player->HandleShrineCollision(shrine->GetElementType());
 			}
 		}
@@ -169,13 +170,15 @@ void Game::InjectFrame()
 
 void Game::InjectKeyDown(int key)
 {
+	this->currentLevel->InjectKeyDown();
+
 	if(this->player)
 		this->player->OnKeyDown(key);
 }
 
 void Game::InjectKeyUp(int key)
 {
-	this->currentLevel->InjectKeyPress();
+	this->currentLevel->InjectKeyUp();
 
 	if(this->player)
 		this->player->OnKeyUp(key);
@@ -257,8 +260,18 @@ void Game::LoadLevel(int levelNumber)
 		return;
 	}
 
-	//skip gameplay stuff for level 1 since it's just the titlescreen // TODO: Make a not shit solution for this
-	if (levelNumber != 1 && levelNumber != GAMEOVER_LEVEL_ID)
+	//skip gameplay stuff for level 1 since it's just the titlescreen // TODO: Make a not shit solution for this!!!
+	if (levelNumber != TITLE_LEVEL_ID &&	//0
+		levelNumber != STORY_LEVEL_ID &&	//1
+		levelNumber != 2 &&
+		levelNumber != 3 &&
+		levelNumber != 4 &&
+		levelNumber != 5 &&
+		levelNumber != 7 &&
+		levelNumber != 9 &&
+		levelNumber != 10 &&
+		levelNumber != 12
+		)
 	{
 		//create the player object
 		this->player = new Player();

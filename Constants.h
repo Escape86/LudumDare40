@@ -11,7 +11,7 @@
 #define PLAYER_OVERLAY_TEXTURE_PATH	"resources/PlayerOverlay.png"
 #define FONT_FILEPATH				"resources/Fonts/Orbitron/Orbitron-Regular.ttf"
 #define COLLECT_ORB_WAVE_FILEPATH	"resources/Audio/orb_collect.wav"
-#define DESTROY_ORB_WAVE_FILEPATH	"resources/Audio/scratch.wav"
+#define DESTROY_ORB_WAVE_FILEPATH	"resources/Audio/orb_destroy.wav"
 #pragma endregion
 
 #pragma region Colors
@@ -30,6 +30,8 @@
 
 #define JOYSTICK_DEAD_ZONE			8000
 
+#define TITLE_LEVEL_ID				0
+#define STORY_LEVEL_ID				1
 #define GAMEOVER_LEVEL_ID			-999
 
 #define ENEMY_REACHES_SHRINE_HP_COST 5

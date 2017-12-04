@@ -1,0 +1,18 @@
+level 0 = title.png
+level 1 = "story"
+level 2 = controls.png
+level 3 = elements.png
+level 4 = goal.png
+level 5 = orblimit1.png
+level 6 = "moving and collecting an orb"
+level 7 = orblimit2.png
+level 8 = "collect orbs and return to shrine"
+level 9 = weakness.png
+level 10 = weakness2.png
+level 11 = "attack a fire orb with water"
+level 12 = goalinfo.png
+level 13 = "clear all orbs from field"
+level 14 = "protect shrines from attacking orbs"
+
+
+

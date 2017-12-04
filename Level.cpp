@@ -1,6 +1,7 @@
 #include "Level.h"
 #include "AreaTrigger.h"
 #include "Enemy.h"
+#include "Texture.h"
 #include "Constants.h"
 
 #ifdef _DEBUG
@@ -12,6 +13,8 @@ Level* Level::Load(int levelNumber, unsigned int loadTime)
 {
 	switch (levelNumber)
 	{
+		case 0:
+			return createLevel0(loadTime);
 		case 1:
 			return createLevel1(loadTime);
 		case 2:
@@ -24,6 +27,22 @@ Level* Level::Load(int levelNumber, unsigned int loadTime)
 			return createLevel5(loadTime);
 		case 6:
 			return createLevel6(loadTime);
+		case 7:
+			return createLevel7(loadTime);
+		case 8:
+			return createLevel8(loadTime);
+		case 9:
+			return createLevel9(loadTime);
+		case 10:
+			return createLevel10(loadTime);
+		case 11:
+			return createLevel11(loadTime);
+		case 12:
+			return createLevel12(loadTime);
+		case 13:
+			return createLevel13(loadTime);
+		case 14:
+			return createLevel14(loadTime);
 
 		case GAMEOVER_LEVEL_ID:
 			return createGameOverLevel(loadTime);
@@ -79,7 +98,7 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 			if (elapsedGameTimeInMilliseconds >= it->whenToShow)
 			{
 				//time to show the text
-				it->idFromCreation = Display::CreateText(it->text, it->x, it->y, it->fontSize);
+				it->idFromCreation = Display::CreateText(it->text, it->x, it->y, it->fontSize, it->fontColor);
 				it->isBeingShown = true;
 			}
 		}
@@ -87,38 +106,92 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 		++it;
 	}
 
-	if (this->levelNumber == 5)
+	//YOLO draw queued textures defined by the level
+	for (std::vector<QueuedTexture>::iterator it = this->queuedTextures.begin(); it != this->queuedTextures.end();)
+	{
+		if (it->isBeingShown)
+		{
+			if (it->durationToShow > -1 && elapsedGameTimeInMilliseconds >= (it->whenToShow + it->durationToShow))
+			{
+				//texture is expired, remove it
+				it = this->queuedTextures.erase(it);
+				continue;
+			}
+			
+			//draw it
+			Display::QueueTextureForRendering(it->texture, it->x, it->y);
+		}
+		else
+		{
+			if (elapsedGameTimeInMilliseconds >= it->whenToShow)
+			{
+				//time to show it
+				it->isBeingShown = true;
+
+				//draw it
+				Display::QueueTextureForRendering(it->texture, it->x, it->y);
+			}
+		}
+
+		++it;
+	}
+
+	if (this->levelNumber == 13)
 	{
 		if (this->queuedEnemies.size() == 0 && this->enemies.size() == 0)
 		{
 			this->shouldAdvanceLevel = true;
 		}
 	}
+	else if (this->levelNumber == 8)
+	{
+		if (this->returnedOrbCount == 5)
+		{
+			this->shouldAdvanceLevel = true;
+		}
+	}
 }
 
-void Level::InjectKeyPress()
+void Level::InjectKeyDown()
 {
-	if (this->levelNumber == 1)
-		this->shouldAdvanceLevel = true;
+	if (!this->isKeyDownPrimed)
+	{
+		this->isKeyDownPrimed = true;
+	}
+}
+
+void Level::InjectKeyUp()
+{
+	if (this->isKeyDownPrimed)
+	{
+		if (this->advancesOnKeyPress)
+			this->shouldAdvanceLevel = true;
+	}
 }
 
 void Level::InjectPlayerOrbCountChanged(int newOrbCount)
 {
 	//ghetto place to put level change logic... totally a hack :(
-	if (this->levelNumber == 2)
+	if (this->levelNumber == 6)
 	{
 		if (newOrbCount == 1)
 		{
 			this->shouldAdvanceLevel = true;
 		}
 	}
-	else if (this->levelNumber == 3)
+	else if (this->levelNumber == 11)
 	{
 		if (newOrbCount == 0)
 		{
 			this->shouldAdvanceLevel = true;
 		}
 	}
+}
+
+void Level::InjectPlayerBroughtOrbToShrine(ElementType orbType, ElementType shrineType, int orbCount)
+{
+	if (orbType == shrineType)
+		this->returnedOrbCount += orbCount;
 }
 
 std::vector<Enemy*>& Level::GetEnemies()
@@ -166,10 +239,12 @@ bool Level::ShouldAdvanceLevel()
 #pragma region Private Methods
 
 #pragma region Constructor
-Level::Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime)
-	: levelNumber(levelNumber), startingNumberOfOrbs(startingNumberOfOrbs), orbCapacityForPlayer(orbCapcityForThisLevel), startingElementType(startingElementType), loadTime(loadTime)
+Level::Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime, bool advancesOnKeyPress)
+	: levelNumber(levelNumber), startingNumberOfOrbs(startingNumberOfOrbs), orbCapacityForPlayer(orbCapcityForThisLevel), startingElementType(startingElementType), loadTime(loadTime), advancesOnKeyPress(advancesOnKeyPress)
 {
-	shouldAdvanceLevel = false;
+	this->shouldAdvanceLevel = false;
+	this->isKeyDownPrimed = false;
+	this->returnedOrbCount = 0;
 
 	//safety check
 #ifdef _DEBUG
@@ -206,34 +281,56 @@ Level::~Level()
 		}
 	}
 	this->queuedText.clear();
+
+	for (QueuedTexture& qt : this->queuedTextures)
+	{
+		if (qt.texture)
+			delete qt.texture;
+	}
+	this->queuedTextures.clear();
 }
 
 Level* Level::createGameOverLevel(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = GAMEOVER_LEVEL_ID;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
 	l->queuedText.push_back({ 100, 250, "Gameover... thanks for playing!", 0, -1, Display::FontSize::THIRTYFOUR, false, -1 });
+	return l;
+}
+
+Level* Level::createLevel0(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = TITLE_LEVEL_ID;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 0, NONE, loadTime, true);
+
+	Texture* t = new Texture("resources/Title.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",				textDelay, -1, Display::FontSize::TWENTY, false, -1, WHITE });
 	return l;
 }
 
 Level* Level::createLevel1(unsigned int loadTime)
 {
-	const int LEVEL_NUMBER = 1;
+	const int LEVEL_NUMBER = STORY_LEVEL_ID;
 
-	const int whenToShowStory = 2000;
+	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
-	l->queuedText.push_back({ 99, 100, "Welcome to Elemental Balance", 0, -1, Display::FontSize::THIRTYFOUR, false, -1});
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	l->queuedText.push_back({ 55, 225, "For as long as time can tell, the world has been in peace and",		textDelay,			-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 250, "harmony. This is thanks to the balance of the three elements",		textDelay + 750,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 275, "of creation: Fire, Water, and Earth. However, something has",		textDelay + 1500,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 300, "disturbed the eternal harmony of the world and the elements are",	textDelay + 2250,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 325, "fighting amongst themselves. Please help restore balance to the",	textDelay + 3000,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 350, "elements so that our world may continue to thrive in tranquility.", textDelay + 3750,	-1, Display::FontSize::TWENTY, false, -1 });
 
-	l->queuedText.push_back({ 55, 225, "For as long as time can tell, the world has been in peace and",		whenToShowStory,		-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 250, "harmony. This is thanks to the balance of the three elements",		whenToShowStory + 750,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 275, "of creation: Fire, Water, and Earth. However, something has",		whenToShowStory + 1500,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 300, "disturbed the eternal harmony of the world and the elements are",	whenToShowStory + 2250,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 325, "fighting amongst themselves. Please help restore balance to the",	whenToShowStory + 3000, -1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 350, "elements so that our world may continue to thrive in tranquility.", whenToShowStory + 3750, -1, Display::FontSize::TWENTY, false, -1 });
-
-	l->queuedText.push_back({ 250, 450, "Press any key to continue...",										whenToShowStory + 4500, -1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
 	return l;
 }
 
@@ -241,32 +338,16 @@ Level* Level::createLevel2(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 2;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+	const int textDelay = 1000;
 
-	const int textDelay1 = 1000;
-	const int textDelay2 = 10000;
-	const int textDelay3 = 17500;
-	const int textDelay4 = 23000;
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
 
-	//section 1
-	l->queuedText.push_back({ 341, 250, "This is you...",											textDelay1,				5000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 120, 338, "you can move around with W,A,S,D or the Arrow keys...",	textDelay1 + 2500,		4000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 255, 363, "(or controller D-pad / Stick)...",							textDelay1 + 4250,		3500, Display::FontSize::TWENTY, false, -1 });
+	Texture* t = new Texture("resources/Controls.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
-	//section 2
-	l->queuedText.push_back({ 140, 225, "You are currently in balance with all the elements...",	textDelay2,				4000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 140, 250, "Which is why you have a neutral color...",					textDelay2 + 2500,		4000, Display::FontSize::TWENTY, false, -1 });
-
-	//section 3
-	l->queuedText.push_back({ 277, 250, "But you can change that...",								textDelay3,				4000, Display::FontSize::TWENTY, false, -1 });
-	
-	//section 4
-	const int waterOrbPositionX = 385;
-	const int waterOrbPositionY = 233;
-	l->queuedText.push_back({ 140, 225, "This is a water orb...",									textDelay4,				6500, Display::FontSize::TWENTY, false, -1 });
-	l->queuedEnemies.push_back({ textDelay4 + 1500, new Enemy(waterOrbPositionX, waterOrbPositionY, waterOrbPositionX, waterOrbPositionY, ElementType::WATER) });
-	l->queuedText.push_back({ 140, 250, "Collecting it will atune you with water...",				textDelay4 + 3000,		5500, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 140, 275, "See for yourself... collect the water orb...",				textDelay4 + 5500,		4500, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
 
 	return l;
 }
@@ -275,60 +356,16 @@ Level* Level::createLevel3(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 3;
 
-	Level* l = new Level(LEVEL_NUMBER, 1, 5, WATER, loadTime);
+	const int textDelay = 1000;
 
-	const int textDelay1 = 1000;
-	const int textDelay2 = 14000;
-	const int textDelay3 = 23000;
-	const int textDelay4 = 35000;
-	const int textDelay5 = 51000;
-	const int textDelay6 = 65000;
-	const int textDelay7 = 81000;
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
 
-	const int fireOrbPositionX = 700;
-	const int fireOrbPositionY = 332;
+	Texture* t = new Texture("resources/Elements.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
-	//section 1
-	l->queuedText.push_back({ 330, 200, "Nicely done...",											textDelay1,				6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 150, 225, "You can only carry so many orbs at once...",				textDelay1 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 150, 250, "Your current orb count and carrying capacity are",			textDelay1 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 150, 275, "shown in the upper right corner of the screen.",			textDelay1 + 5000,		6000, Display::FontSize::TWENTY, false, -1 });
-
-	//section 2
-	l->queuedText.push_back({ 100, 250, "Additionaly, your health is shown in the upper left...",	textDelay2,				6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 275, "If it reaches zero, it's lights out!",						textDelay2 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
-
-	//section 3
-	l->queuedText.push_back({ 100, 250, "If you are carrying more than your capacity, you will",	textDelay3,				6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 275, "become over-charged and take damage every second!",		textDelay3 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 300, "The more over-charged you are, the more damage you take,",	textDelay3 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 325, "so be careful.",											textDelay3 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
-
-	//section 4
-	l->queuedText.push_back({ 100, 250, "You can only be attuned to one element at a time...",		textDelay4,				6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 275, "When you are neutral, picking up any orb will attune you",	textDelay4 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 300, "to the orb's element. If you are already attuned, then",	textDelay4 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 325, "picking up a different type of orb will have a different",	textDelay4 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 350, "effect depending on its type.",							textDelay4 + 8000,		6000, Display::FontSize::TWENTY, false, -1 });
-
-	//section 5
-	l->queuedText.push_back({ 100, 250, "Each element is weak against another element:",			textDelay5,				6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 275, "Fire is weak to Water",									textDelay5 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 300, "Water is weak to Earth",									textDelay5 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 325, "Earth is weak to Fire",									textDelay5 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
-
-	//section 6
-	l->queuedText.push_back({ 100, 250, "If the orb you touch is weak to an orb your're",			textDelay6,				6500, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 275, "carrying, they will destroy each other. However if your",	textDelay6 + 2000,		6500, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 300, " orb is weak to the type you touch, then they will",		textDelay6 + 4000,		6500, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 325, " destroy each other and damage you in the process!",		textDelay6 + 6000,		6500, Display::FontSize::TWENTY, false, -1 });
-
-	//section 7
-	l->queuedText.push_back({ 100, 250, "This is a good way to eliminate orbs on the field while",	textDelay7,				6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 275, "also preventing yourself from becoming overcharged!",		textDelay7 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 300, "Try it for yourself... you currently hold a water orb",	textDelay7 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 100, 325, "which means fire is weak to you. Attack this fire orb!",	textDelay7 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedEnemies.push_back({ textDelay7 + 7500, new Enemy(fireOrbPositionX, fireOrbPositionY, fireOrbPositionX, fireOrbPositionY, ElementType::FIRE) });
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
 
 	return l;
 }
@@ -337,14 +374,87 @@ Level* Level::createLevel4(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 4;
 
-	const int textDelay1 = 1000;
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+
+	Texture* t = new Texture("resources/Goal.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+	
+}
+
+Level* Level::createLevel5(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 5;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+
+	Texture* t = new Texture("resources/OrbLimit1.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+}
+
+Level* Level::createLevel6(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 6;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
+
+	const int textDelay = 1000;
+
+	const int waterOrbPositionX = 385;
+	const int waterOrbPositionY = 233;
+	l->queuedText.push_back({ 140, 225, "This is a water orb...",									textDelay,				6500, Display::FontSize::TWENTY, false, -1, BLACK });
+	l->queuedEnemies.push_back({ textDelay + 1500, new Enemy(waterOrbPositionX, waterOrbPositionY, waterOrbPositionX, waterOrbPositionY, ElementType::WATER) });
+	l->queuedText.push_back({ 140, 250, "Collecting it will atune you with water...",				textDelay + 3000,		5500, Display::FontSize::TWENTY, false, -1, BLACK });
+	l->queuedText.push_back({ 140, 275, "See for yourself... collect the water orb...",				textDelay + 5500,		4500, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+}
+
+Level* Level::createLevel7(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 7;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+
+	Texture* t = new Texture("resources/OrbLimit2.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+}
+
+Level* Level::createLevel8(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 8;
+
+	const int textDelay = 1000;
 	const int waterShrineX = SCREEN_WIDTH - 40;
 	const int waterShrineY = SCREEN_HEIGHT - 40;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
 
 	//section 1
-	l->queuedText.push_back({ 100, 200, "Collect the orbs and return them to the shrine...",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 200, "Collect the orbs and return them to the shrine...",	textDelay,				-1, Display::FontSize::TWENTY, false, -1, BLACK });
 	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER) });
 
 	l->queuedEnemies.push_back({ 0, new Enemy(320, 400, 320, 400, ElementType::WATER) });
@@ -356,16 +466,87 @@ Level* Level::createLevel4(unsigned int loadTime)
 	return l;
 }
 
-Level* Level::createLevel5(unsigned int loadTime)
+Level* Level::createLevel9(unsigned int loadTime)
 {
-	const int LEVEL_NUMBER = 5;
+	const int LEVEL_NUMBER = 9;
 
-	const int textDelay1 = 1000;
+	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+
+	Texture* t = new Texture("resources/Weakness.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+}
+
+Level* Level::createLevel10(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 10;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+
+	Texture* t = new Texture("resources/Weakness2.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+}
+
+Level* Level::createLevel11(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 11;
+
+	Level* l = new Level(LEVEL_NUMBER, 1, 5, WATER, loadTime, false);
+
+	const int textDelay = 1000;
+
+	const int fireOrbPositionX = 700;
+	const int fireOrbPositionY = 332;
+
+	l->queuedText.push_back({ 100, 325, "Attack the fire orb!",	textDelay,		4000, Display::FontSize::TWENTY, false, -1, BLACK });
+	l->queuedEnemies.push_back({ textDelay + 1000, new Enemy(fireOrbPositionX, fireOrbPositionY, fireOrbPositionX, fireOrbPositionY, ElementType::FIRE) });
+
+	return l;
+}
+
+Level* Level::createLevel12(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 12;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+
+	Texture* t = new Texture("resources/GoalInfo.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+}
+
+Level* Level::createLevel13(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 13;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
 
 	//section 1
-	l->queuedText.push_back({ 240, 100, "Remove all orbs from the field...",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 240, 100, "Remove all orbs from the field...",	textDelay,				-1, Display::FontSize::TWENTY, false, -1, BLACK });
 
 	int x1 = 300; int y1 = 250;
 	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += 40;
@@ -374,7 +555,7 @@ Level* Level::createLevel5(unsigned int loadTime)
 	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::FIRE) });  x1 += 40;
 	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += 40;
 	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::FIRE) });
-	
+
 	int x2 = 300; int y2 = 450;
 	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::WATER) });	x2 += 40;
 	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::FIRE) });	x2 += 40;
@@ -399,22 +580,22 @@ Level* Level::createLevel5(unsigned int loadTime)
 	return l;
 }
 
-Level* Level::createLevel6(unsigned int loadTime)
+Level* Level::createLevel14(unsigned int loadTime)
 {
-	const int LEVEL_NUMBER = 6;
+	const int LEVEL_NUMBER = 14;
 
-	const int textDelay1 = 1000;
+	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
 
-	l->queuedText.push_back({ 190, 100, "Protect the Earth Shrine from Fire Orbs",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 190, 100, "Protect the Earth Shrine from Fire Orbs",	textDelay,				-1, Display::FontSize::TWENTY, false, -1, BLACK });
 
 	const int fireShrineX = 40;
 	const int fireShrineY = SCREEN_HEIGHT - 40;
 	const int plantShrineX = SCREEN_WIDTH - 40;
 	const int plantShrineY = SCREEN_HEIGHT - 40;
 
-	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE)    });
+	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE) });
 	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT) });
 
 	//friendly orbs

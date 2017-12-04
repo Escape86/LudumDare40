@@ -6,6 +6,7 @@
 #pragma region Forward Declarations
 class Enemy;
 class AreaTrigger;
+class Texture;
 enum ElementType;
 #pragma endregion
 
@@ -17,8 +18,10 @@ public:
 	~Level();
 
 	void InjectFrame(unsigned int elapsedGameTimeInMilliseconds);
-	void InjectKeyPress();
+	void InjectKeyDown();
+	void InjectKeyUp();
 	void InjectPlayerOrbCountChanged(int newOrbCount);
+	void InjectPlayerBroughtOrbToShrine(ElementType orbType, ElementType shrineType, int orbCount);
 
 	std::vector<Enemy*>& GetEnemies();
 	std::vector<AreaTrigger*>& GetShrines();
@@ -34,14 +37,23 @@ public:
 private:
 	static Level* createGameOverLevel(unsigned int loadTime);
 
+	static Level* createLevel0(unsigned int loadTime);
 	static Level* createLevel1(unsigned int loadTime);
 	static Level* createLevel2(unsigned int loadTime);
 	static Level* createLevel3(unsigned int loadTime);
 	static Level* createLevel4(unsigned int loadTime);
 	static Level* createLevel5(unsigned int loadTime);
 	static Level* createLevel6(unsigned int loadTime);
+	static Level* createLevel7(unsigned int loadTime);
+	static Level* createLevel8(unsigned int loadTime);
+	static Level* createLevel9(unsigned int loadTime);
+	static Level* createLevel10(unsigned int loadTime);
+	static Level* createLevel11(unsigned int loadTime);
+	static Level* createLevel12(unsigned int loadTime);
+	static Level* createLevel13(unsigned int loadTime);
+	static Level* createLevel14(unsigned int loadTime);
 
-	Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime);
+	Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime, bool advancesOnKeyPress);
 
 	std::vector<Enemy*> enemies;
 	std::vector<AreaTrigger*> areaTriggers;
@@ -51,6 +63,9 @@ private:
 	const ElementType startingElementType;
 	const int startingNumberOfOrbs;
 	const int orbCapacityForPlayer;
+	const bool advancesOnKeyPress;
+	bool isKeyDownPrimed;
+	int returnedOrbCount;
 
 	struct QueuedEnemy
 	{
@@ -76,8 +91,20 @@ private:
 		Display::FontSize fontSize;
 		bool isBeingShown;
 		int idFromCreation;
+		SDL_Color fontColor;
 	};
 	std::vector<QueuedText> queuedText;
+
+	struct QueuedTexture
+	{
+		int x;
+		int y;
+		unsigned int whenToShow;
+		int durationToShow;
+		Texture* texture;
+		bool isBeingShown;
+	};
+	std::vector<QueuedTexture> queuedTextures;
 
 	bool shouldAdvanceLevel;
 };
