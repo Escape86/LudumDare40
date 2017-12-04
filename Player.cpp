@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Texture.h"
 #include "Display.h"
+#include "Audio.h"
 #include "Constants.h"
 
 const int OverChargeTimerDuration = 1000;
@@ -193,12 +194,13 @@ void Player::ResetVerticalVelocity()
 	this->verticalVelocity = 0;
 }
 
-void Player::HandleElementCollision(ElementType typeFromCollision)
+void Player::HandleOrbCollision(ElementType typeFromCollision)
 {
 	//did we collide with our current element?
 	if (this->type == typeFromCollision)
 	{
 		this->orbCount++;
+		Audio::PlayAudio(Audio::AudioTracks::COLLECT_ORB);
 		return;
 	}
 
@@ -207,9 +209,12 @@ void Player::HandleElementCollision(ElementType typeFromCollision)
 	{
 		this->type = typeFromCollision;
 		this->orbCount = 1;
+		Audio::PlayAudio(Audio::AudioTracks::COLLECT_ORB);
 
 		//destroy old texture and replace with new one that matches our new element type
 		this->SetTexture(ELEMENTTYPE_TO_DOT_TEXTURE[this->type]);
+		this->width = this->overlayTexture->GetWidth();
+		this->height = this->overlayTexture->GetHeight();
 
 		return;
 	}
@@ -217,13 +222,15 @@ void Player::HandleElementCollision(ElementType typeFromCollision)
 	//check if we collided with our element's weakness
 	if (ELEMENTTYPE_WEAKNESS[this->type] == typeFromCollision)
 	{
-		this->hp--;
+		this->hp -= 10;
 		this->orbCount--;
+		Audio::PlayAudio(Audio::AudioTracks::DESTROY_ORB);
 	}
 	//check if we are the weakness of what we collided with
 	else if (ELEMENTTYPE_WEAKNESS[typeFromCollision] == this->type)
 	{
 		this->orbCount--;
+		Audio::PlayAudio(Audio::AudioTracks::DESTROY_ORB);
 	}
 
 	//did we become neutral as a result?
@@ -233,6 +240,35 @@ void Player::HandleElementCollision(ElementType typeFromCollision)
 
 		//destroy old texture and replace with new one that matches our new element type
 		this->SetTexture(ELEMENTTYPE_TO_DOT_TEXTURE[this->type]);
+		this->width = this->overlayTexture->GetWidth();
+		this->height = this->overlayTexture->GetHeight();
+	}
+}
+
+void Player::HandleShrineCollision(ElementType shrineType)
+{
+	//are we neutral?
+	if ((this->orbCount == 0) && (this->type == ElementType::NONE))
+	{
+		//nothing to do
+		return;
+	}
+
+	//did we collide with our current element?
+	if (this->type == shrineType)
+	{
+		this->orbCount = 0;
+	}
+
+	//did we become neutral as a result?
+	if (this->orbCount == 0)
+	{
+		this->type = ElementType::NONE;
+
+		//destroy old texture and replace with new one that matches our new element type
+		this->SetTexture(ELEMENTTYPE_TO_DOT_TEXTURE[this->type]);
+		this->width = this->overlayTexture->GetWidth();
+		this->height = this->overlayTexture->GetHeight();
 	}
 }
 
@@ -248,6 +284,8 @@ void Player::SetOrbCount(int value, ElementType type)
 
 	//destroy old texture and replace with new one that matches our new element type
 	this->SetTexture(ELEMENTTYPE_TO_DOT_TEXTURE[this->type]);
+	this->width = this->overlayTexture->GetWidth();
+	this->height = this->overlayTexture->GetHeight();
 }
 
 int Player::GetMaxOrbCount()

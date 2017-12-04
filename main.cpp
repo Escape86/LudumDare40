@@ -1,9 +1,15 @@
 #include "Display.h"
+#include "Audio.h"
 #include "Game.h"
 
 int main(int argc, char* args[])
 {
 	if (!Display::Initialize())
+	{
+		return -1;
+	}
+
+	if (!Audio::Initialize())
 	{
 		return -1;
 	}
@@ -56,6 +62,11 @@ int main(int argc, char* args[])
 	}
 
 	delete game;
+
+	if (!Audio::ShutDown())
+	{
+		return -1;
+	}
 
 	if (!Display::ShutDown())
 	{

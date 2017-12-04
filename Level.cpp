@@ -86,12 +86,20 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 
 		++it;
 	}
+
+	if (this->levelNumber == 5)
+	{
+		if (this->queuedEnemies.size() == 0 && this->enemies.size() == 0)
+		{
+			this->shouldAdvanceLevel = true;
+		}
+	}
 }
 
 void Level::InjectKeyPress()
 {
 	if (this->levelNumber == 1)
-		shouldAdvanceLevel = true;
+		this->shouldAdvanceLevel = true;
 }
 
 void Level::InjectPlayerOrbCountChanged(int newOrbCount)
@@ -330,42 +338,20 @@ Level* Level::createLevel4(unsigned int loadTime)
 	const int LEVEL_NUMBER = 4;
 
 	const int textDelay1 = 1000;
+	const int waterShrineX = SCREEN_WIDTH - 40;
+	const int waterShrineY = SCREEN_HEIGHT - 40;
 
 	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
 
 	//section 1
-	l->queuedText.push_back({ 330, 200, "Level 4",													textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 200, "Collect the orbs and return them to the shrine...",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER) });
 
-	l->queuedEnemies.push_back({ 0, new Enemy(100, 100, 100, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(120, 100, 120, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(140, 100, 140, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(160, 100, 160, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(180, 100, 180, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(200, 100, 200, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(220, 100, 220, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(240, 100, 240, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(260, 100, 260, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(280, 100, 280, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(300, 100, 300, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(320, 100, 320, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(340, 100, 340, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(360, 100, 360, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(380, 100, 380, 100, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(100, 120, 100, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(120, 120, 120, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(140, 120, 140, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(160, 120, 160, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(180, 120, 180, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(200, 120, 200, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(220, 120, 220, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(240, 120, 240, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(260, 120, 260, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(280, 120, 280, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(300, 120, 300, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(320, 120, 320, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(340, 120, 340, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(360, 120, 360, 120, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(380, 120, 380, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(320, 400, 320, 400, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(360, 400, 360, 400, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(400, 400, 400, 400, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(440, 400, 440, 400, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(480, 400, 480, 400, ElementType::WATER) });
 
 	return l;
 }
@@ -374,8 +360,42 @@ Level* Level::createLevel5(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 5;
 
+	const int textDelay1 = 1000;
+
 	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
 
+	//section 1
+	l->queuedText.push_back({ 240, 100, "Remove all orbs from the field...",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
+
+	int x1 = 300; int y1 = 250;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::FIRE) });  x1 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::FIRE) });  x1 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::FIRE) });
+	
+	int x2 = 300; int y2 = 450;
+	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::WATER) });	x2 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::FIRE) });	x2 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::WATER) });	x2 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::FIRE) });	x2 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::WATER) });	x2 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::FIRE) });
+
+	int x3 = 175; int y3 = 350;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::WATER) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::WATER) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::WATER) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::WATER) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::WATER) }); x3 += 40;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::WATER) });
 	return l;
 }
 
@@ -383,7 +403,11 @@ Level* Level::createLevel6(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 6;
 
+	const int textDelay1 = 1000;
+
 	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+
+	l->queuedText.push_back({ 240, 100, "Level 6",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
 
 	//const int waterShrineX = SCREEN_WIDTH / 2;
 	//const int waterShrineY = 40;

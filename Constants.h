@@ -10,6 +10,8 @@
 #define RED_DOT_TEXTURE_PATH		"resources/Orb_Fire.png"
 #define PLAYER_OVERLAY_TEXTURE_PATH	"resources/PlayerOverlay.png"
 #define FONT_FILEPATH				"resources/Fonts/Orbitron/Orbitron-Regular.ttf"
+#define COLLECT_ORB_WAVE_FILEPATH	"resources/Audio/orb_collect.wav"
+#define DESTROY_ORB_WAVE_FILEPATH	"resources/Audio/scratch.wav"
 #pragma endregion
 
 #pragma region Colors

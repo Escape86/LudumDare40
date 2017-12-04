@@ -17,7 +17,8 @@ public:
 	void ResetHorizontalVelocity();
 	void ResetVerticalVelocity();
 
-	void HandleElementCollision(ElementType typeFromCollision);
+	void HandleOrbCollision(ElementType typeFromCollision);
+	void HandleShrineCollision(ElementType shrineType);
 	int GetOrbCount();
 	void SetOrbCount(int value, ElementType type);
 	int GetMaxOrbCount();

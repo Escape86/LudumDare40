@@ -74,19 +74,20 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\Code Repos\SDL2-2.0.7\include;D:\Code Repos\SDL2_image-2.0.2\include;D:\Code Repos\SDL2_ttf-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code Repos\SDL2-2.0.7\include;D:\Code Repos\SDL2_image-2.0.2\include;D:\Code Repos\SDL2_ttf-2.0.14\include;D:\Code Repos\SDL2_mixer-2.0.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>D:\Code Repos\SDL2-2.0.7\lib\x86;D:\Code Repos\SDL2_image-2.0.2\lib\x86;D:\Code Repos\SDL2_ttf-2.0.14\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Code Repos\SDL2-2.0.7\lib\x86;D:\Code Repos\SDL2_image-2.0.2\lib\x86;D:\Code Repos\SDL2_ttf-2.0.14\lib\x86;D:\Code Repos\SDL2_mixer-2.0.2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>COPY "D:\Code Repos\SDL2-2.0.7\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"
 COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\SDL2_image.dll" "$(ProjectDir)\$(Configuration)"
 COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\libpng16-16.dll" "$(ProjectDir)\$(Configuration)"
 COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\zlib1.dll" "$(ProjectDir)\$(Configuration)"
-COPY "D:\Code Repos\SDL2_ttf-2.0.14\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"</Command>
+COPY "D:\Code Repos\SDL2_ttf-2.0.14\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"
+COPY "D:\Code Repos\SDL2_mixer-2.0.2\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -115,21 +116,22 @@ COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\zlib1.dll" "$(ProjectDir)\$(Configu
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\Code Repos\SDL2-2.0.7\include;D:\Code Repos\SDL2_image-2.0.2\include;D:\Code Repos\SDL2_ttf-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code Repos\SDL2-2.0.7\include;D:\Code Repos\SDL2_image-2.0.2\include;D:\Code Repos\SDL2_ttf-2.0.14\include;D:\Code Repos\SDL2_mixer-2.0.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>D:\Code Repos\SDL2-2.0.7\lib\x86;D:\Code Repos\SDL2_image-2.0.2\lib\x86;D:\Code Repos\SDL2_ttf-2.0.14\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Code Repos\SDL2-2.0.7\lib\x86;D:\Code Repos\SDL2_image-2.0.2\lib\x86;D:\Code Repos\SDL2_ttf-2.0.14\lib\x86;D:\Code Repos\SDL2_mixer-2.0.2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>COPY "D:\Code Repos\SDL2-2.0.7\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"
 COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\SDL2_image.dll" "$(ProjectDir)\$(Configuration)"
 COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\libpng16-16.dll" "$(ProjectDir)\$(Configuration)"
 COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\zlib1.dll" "$(ProjectDir)\$(Configuration)"
-COPY "D:\Code Repos\SDL2_ttf-2.0.14\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"</Command>
+COPY "D:\Code Repos\SDL2_ttf-2.0.14\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"
+COPY "D:\Code Repos\SDL2_mixer-2.0.2\lib\x86\*.dll" "$(ProjectDir)\$(Configuration)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,6 +159,7 @@ COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\zlib1.dll" "$(ProjectDir)\$(Configu
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AreaTrigger.cpp" />
+    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="ElementTypes.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -169,6 +172,7 @@ COPY "D:\Code Repos\SDL2_image-2.0.2\lib\x86\zlib1.dll" "$(ProjectDir)\$(Configu
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AreaTrigger.h" />
+    <ClInclude Include="Audio.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="ElementTypes.h" />

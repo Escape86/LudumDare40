@@ -38,6 +38,18 @@ void Game::InjectFrame()
 		return;
 	}
 
+	if (this->player)
+	{
+		//check health for gameover condition
+		const int hp = this->player->GetHp();
+		if (hp <= 0)
+		{
+			//game over!
+			this->LoadLevel(GAMEOVER_LEVEL_ID);
+			return;
+		}
+	}
+
 	Uint32 elapsedTimeInMilliseconds = SDL_GetTicks();
 
 	this->currentLevel->InjectFrame(elapsedTimeInMilliseconds - this->currentLevel->GetLevelLoadTime());
@@ -64,7 +76,7 @@ void Game::InjectFrame()
 		if (this->player->TestCollision(enemy))
 		{
 			enemyCollision = true;
-			this->player->HandleElementCollision(enemy->GetElementType());
+			this->player->HandleOrbCollision(enemy->GetElementType());
 			this->currentLevel->InjectPlayerOrbCountChanged(this->player->GetOrbCount());
 		}
 
@@ -88,6 +100,17 @@ void Game::InjectFrame()
 		}
 	}
 
+	if (this->player)
+	{
+		for (AreaTrigger* const shrine : shrines)
+		{
+			if (this->player->TestCollision(shrine))
+			{
+				this->player->HandleShrineCollision(shrine->GetElementType());
+			}
+		}
+	}
+
 	//draw area triggers
 	for (AreaTrigger* const at : shrines)
 	{
@@ -102,19 +125,11 @@ void Game::InjectFrame()
 
 	if (this->player)
 	{
-		//check health
-		const int hp = this->player->GetHp();
-		if (hp <= 0)
-		{
-			//game over!
-			this->LoadLevel(GAMEOVER_LEVEL_ID);
-			return;
-		}
-
 		//draw player
 		this->player->Draw();
 
 		//update text controls
+		const int hp = this->player->GetHp();
 		char hpText[8];
 		sprintf_s(hpText, "%d%%", hp);
 		SDL_Color hpColor = BLACK;
