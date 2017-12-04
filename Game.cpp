@@ -5,6 +5,7 @@
 #include "AreaTrigger.h"
 #include "Display.h"
 #include "Constants.h"
+#include "Audio.h"
 
 #pragma region Constructor
 
@@ -17,7 +18,7 @@ Game::Game()
 	this->isLevelEnding = false;
 
 	//setup first level
-	this->LoadLevel(0);
+	this->LoadLevel(14);
 }
 
 #pragma endregion
@@ -109,11 +110,26 @@ void Game::InjectFrame()
 
 		for (AreaTrigger* const shrine : shrines)
 		{
+			ElementType shrineType = shrine->GetElementType();
+			ElementType enemyType = enemy->GetElementType();
+
+			if (shrineType == enemyType)
+				continue;
+
 			if (shrine->TestCollision(enemy))
 			{
-				//enemy reach an area trigger
-				this->player->SetHp(this->player->GetHp() - ENEMY_REACHES_SHRINE_HP_COST);
+				//if we reached here, then enemy reached a shrine other than it's own type
 				enemyCollision = true;
+
+				//is it the shrine's weakness?
+				if (ELEMENTTYPE_WEAKNESS[shrineType] == enemyType)
+				{
+					//yup, so punish the player
+					this->player->SetHp(this->player->GetHp() - ENEMY_REACHES_SHRINE_HP_COST);
+
+					Audio::PlayAudio(Audio::SHRINE_ATTACKED);
+				}
+				
 			}
 		}
 
@@ -129,12 +145,25 @@ void Game::InjectFrame()
 
 	if (this->player)
 	{
-		for (AreaTrigger* const shrine : shrines)
+		const int playerOrbCount = this->player->GetOrbCount();
+
+		if (playerOrbCount > 0)
 		{
-			if (this->player->TestCollision(shrine))
+			for (AreaTrigger* const shrine : shrines)
 			{
-				this->currentLevel->InjectPlayerBroughtOrbToShrine(this->player->GetElementType(), shrine->GetElementType(), this->player->GetOrbCount());
-				this->player->HandleShrineCollision(shrine->GetElementType());
+				if (this->player->TestCollision(shrine))
+				{
+					ElementType shrineType = shrine->GetElementType();
+					ElementType playerType = this->player->GetElementType();
+
+					this->currentLevel->InjectPlayerBroughtOrbToShrine(playerType, shrineType, playerOrbCount);
+					this->player->HandleShrineCollision(shrine->GetElementType());
+
+					if (shrineType == playerType)
+					{
+						Audio::PlayAudio(Audio::DESTROY_ORB);
+					}
+				}
 			}
 		}
 	}
@@ -300,7 +329,8 @@ void Game::LoadLevel(int levelNumber)
 		levelNumber != 7 &&
 		levelNumber != 9 &&
 		levelNumber != 10 &&
-		levelNumber != 12
+		levelNumber != 12 &&
+		levelNumber != 15
 		)
 	{
 		//create the player object

@@ -43,6 +43,12 @@ Level* Level::Load(int levelNumber, unsigned int loadTime)
 			return createLevel13(loadTime);
 		case 14:
 			return createLevel14(loadTime);
+		case 15:
+			return createLevel15(loadTime);
+		case 16:
+			return createLevel16(loadTime);
+		case 17:
+			return createLevel17(loadTime);
 
 		case GAMEOVER_LEVEL_ID:
 			return createGameOverLevel(loadTime);
@@ -136,7 +142,7 @@ void Level::InjectFrame(unsigned int elapsedLevelTimeInMilliseconds)
 		++it;
 	}
 
-	if (this->levelNumber == 13)
+	if (this->levelNumber == 13 || this->levelNumber == 14 || this->levelNumber == 16)
 	{
 		if (this->queuedEnemies.size() == 0 && this->enemies.size() == 0)
 		{
@@ -641,4 +647,151 @@ Level* Level::createLevel14(unsigned int loadTime)
 	return l;
 }
 
+Level* Level::createLevel15(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 15;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
+
+	Texture* t = new Texture("resources/Remember.png");
+	bool loaded = t->Load();
+	assert(loaded);
+	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
+
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	return l;
+}
+
+Level* Level::createLevel16(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 16;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 10, NONE, loadTime, false, true);
+
+	//section 1
+	l->queuedText.push_back({ 240, 35, "Remove all orbs from the field...",	textDelay,				-1, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	int x1 = 300; int y1 = 275; const int stepAmountX1 = 20; const int stepAmountY1 = 15;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });	x1 -= stepAmountX1; y1 -= stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::PLANT) });
+
+	//section 2
+	int x2 = 160; int y2 = 95;
+	for (int i = 0; i < 20; i++)
+	{
+		l->queuedEnemies.push_back({ 0, new Enemy(x2, y2, x2, y2, ElementType::WATER) });
+		x2 += 25;
+	}
+
+	//section 3
+	int x3 = 500; int y3 = 275; const int stepAmountX3 = 20; const int stepAmountY3 = 15;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });	x3 += stepAmountX3; y3 -= stepAmountY3;
+	l->queuedEnemies.push_back({ 0, new Enemy(x3, y3, x3, y3, ElementType::FIRE) });
+
+	//section 4
+	int x4 = 300; int y4 = 400; const int stepAmountX4 = 20; const int stepAmountY4 = 15;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::WATER) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::WATER) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::FIRE) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::FIRE) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::PLANT) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::PLANT) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::WATER) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::WATER) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::FIRE) });	x4 -= stepAmountX4; y4 += stepAmountY4;
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::FIRE) });
+
+	//section 5
+	int x5 = 160; int y5 = 575;
+	for (int i = 0; i < 20; i += 3)
+	{
+		l->queuedEnemies.push_back({ 0, new Enemy(x5, y5, x5, y5, ElementType::PLANT) });
+		x5 += 25;
+		l->queuedEnemies.push_back({ 0, new Enemy(x5, y5, x5, y5, ElementType::WATER) });
+		x5 += 25;
+		l->queuedEnemies.push_back({ 0, new Enemy(x5, y5, x5, y5, ElementType::FIRE) });
+		x5 += 25;
+	}
+
+	//section 6
+	int x6 = 500; int y6 = 400; const int stepAmountX6 = 20; const int stepAmountY6 = 15;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::FIRE) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::WATER) });	x6 += stepAmountX6; y6 += stepAmountY6;
+	l->queuedEnemies.push_back({ 0, new Enemy(x6, y6, x6, y6, ElementType::PLANT) });
+
+	return l;
+}
+
+Level* Level::createLevel17(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 17;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, true);
+
+	l->queuedText.push_back({ 190, 100, "Protect the Shrines...",	textDelay,				3000, Display::FontSize::TWENTY, false, -1, BLACK });
+
+	const int fireShrineX = SCREEN_WIDTH - 40;
+	const int fireShrineY = (SCREEN_HEIGHT / 2) - 20;
+	const int plantShrineX = 40;
+	const int plantShrineY = (SCREEN_HEIGHT / 2) - 20;
+	const int waterShrineX = (SCREEN_WIDTH / 2);
+	const int waterShrineY = SCREEN_HEIGHT - 40;
+
+	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE) });
+	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT) });
+	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER) });
+
+	//section 1
+	int x1 = 300; int y1 = 500; const int stepAmountX1 = 20; const int stepAmountY1 = 15;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) });
+
+
+
+	////attacking orbs
+	//for (unsigned int i = 1; i < 10; i++)
+	//{
+	//	int x2 = 100; int y2 = 400; const int x2Offset = 50;
+	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) });
+	//}
+
+	return l;
+}
 #pragma endregion

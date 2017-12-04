@@ -49,4 +49,5 @@ std::map<Audio::AudioTracks, const char*> AudioTrackToFilePathMapping =
 {
 	{ Audio::AudioTracks::COLLECT_ORB, COLLECT_ORB_WAVE_FILEPATH },
 	{ Audio::AudioTracks::DESTROY_ORB, DESTROY_ORB_WAVE_FILEPATH },
+	{ Audio::AudioTracks::SHRINE_ATTACKED, SHRINE_ATTACKED_WAVE_FILEPATH },
 };

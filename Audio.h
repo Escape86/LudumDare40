@@ -12,7 +12,8 @@ public:
 	enum AudioTracks
 	{
 		COLLECT_ORB,
-		DESTROY_ORB
+		DESTROY_ORB,
+		SHRINE_ATTACKED
 
 		//add entry to file path mapping when adding track to enum
 	};

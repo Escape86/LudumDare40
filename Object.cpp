@@ -32,6 +32,11 @@ void Object::Draw()
 
 bool Object::TestCollision(Object* otherObject)
 {
+	const int thisHalfWidth = this->width / 2;
+	const int thisHalfHeight = this->height / 2;
+	const int otherHalfWidth = otherObject->width / 2;
+	const int otherHalfHeight = otherObject->height / 2;
+
 	//The sides of the rectangles
 	int leftA, leftB;
 	int rightA, rightB;
@@ -39,16 +44,16 @@ bool Object::TestCollision(Object* otherObject)
 	int bottomA, bottomB;
 
 	//Calculate the sides of rect A
-	leftA = this->x;
-	rightA = this->x + this->width;
-	topA = this->y;
-	bottomA = this->y + this->height;
+	leftA = this->x - thisHalfWidth;
+	rightA = this->x + thisHalfWidth;
+	topA = this->y - thisHalfHeight;
+	bottomA = this->y + thisHalfHeight;
 
 	//Calculate the sides of rect B
-	leftB = otherObject->x;
-	rightB = otherObject->x + otherObject->width;
-	topB = otherObject->y;
-	bottomB = otherObject->y + otherObject->height;
+	leftB = otherObject->x - otherHalfWidth;
+	rightB = otherObject->x + otherHalfWidth;
+	topB = otherObject->y - otherHalfHeight;
+	bottomB = otherObject->y + otherHalfHeight;
 
 	//If any of the sides from A are outside of B
 	if (bottomA <= topB)

@@ -12,7 +12,9 @@ level 10 = weakness2.png
 level 11 = "attack a fire orb with water"
 level 12 = goalinfo.png
 level 13 = "clear all orbs from field"
-level 14 = "protect shrines from attacking orbs"
-
+level 14 = "protect earth shrine from fire orbs"
+level 15 = donot.png
+level 16 = "clear all orbs from field again"
+level 17 = "protect shrines from attacking orbs"
 
 

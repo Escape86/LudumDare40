@@ -35,26 +35,15 @@ void Enemy::InjectFrame(unsigned int elapsedGameTime, unsigned int previousFrame
 	double yRatio;
 
 	//which direction do we need to move the farthest in?
-	if (xDistance > yDistance)
+	if (abs(xDistance) > abs(yDistance))
 	{
 		xRatio = this->x > targetX ? -1.0 : 1.0;
-		yRatio = yDistance / xDistance;
+		yRatio = yDistance / abs(xDistance);
 	}
 	else
 	{
 		xRatio = xDistance / yDistance;
 		yRatio = this->y > targetY ? -1.0 : 1.0;
-	}
-
-	if (xRatio > ENEMY_VELOCITY)
-	{
-		yRatio = yRatio / xRatio;
-		xRatio = 1.0;
-	}
-	else if (yRatio > ENEMY_VELOCITY)
-	{
-		xRatio = xRatio / yRatio;
-		yRatio = 1.0;
 	}
 
 	this->x += (xRatio * ENEMY_VELOCITY);
