@@ -14,7 +14,7 @@ AreaTrigger::~AreaTrigger()
 
 }
 
-void AreaTrigger::InjectFrame()
+void AreaTrigger::InjectFrame(unsigned int elapsedGameTime, unsigned int previousFrameTime)
 {
 
 }

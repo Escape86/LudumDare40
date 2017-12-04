@@ -24,4 +24,6 @@ private:
 
 	int playerOrbCountTextId;
 	int playerHpTextId;
+
+	unsigned int previousFrameEndTime;
 };

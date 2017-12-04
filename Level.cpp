@@ -3,17 +3,30 @@
 #include "Enemy.h"
 #include "Constants.h"
 
+#ifdef _DEBUG
+	#include <assert.h>
+#endif
+
 #pragma region Public Methods
-Level* Level::Load(int levelNumber)
+Level* Level::Load(int levelNumber, unsigned int loadTime)
 {
 	switch (levelNumber)
 	{
 		case 1:
-			return createLevel1();
+			return createLevel1(loadTime);
 		case 2:
-			return createLevel2();
+			return createLevel2(loadTime);
 		case 3:
-			return createLevel3();
+			return createLevel3(loadTime);
+		case 4:
+			return createLevel4(loadTime);
+		case 5:
+			return createLevel5(loadTime);
+		case 6:
+			return createLevel6(loadTime);
+
+		case GAMEOVER_LEVEL_ID:
+			return createGameOverLevel(loadTime);
 
 		default:
 			return nullptr;
@@ -35,6 +48,20 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 		++it;
 	}
 
+	//spawn any shrines that are ready
+	for (std::vector<QueuedAreaTrigger>::iterator it = this->queuedAreaTriggers.begin(); it != this->queuedAreaTriggers.end();)
+	{
+		if (elapsedGameTimeInMilliseconds >= it->spawnTime)
+		{
+			this->areaTriggers.push_back(it->areaTrigger);
+			it = this->queuedAreaTriggers.erase(it);
+			continue;
+		}
+
+		++it;
+	}
+
+	//show / hide any text that needs it
 	for (std::vector<QueuedText>::iterator it = this->queuedText.begin(); it != this->queuedText.end();)
 	{
 		if (it->isBeingShown)
@@ -67,6 +94,17 @@ void Level::InjectKeyPress()
 		shouldAdvanceLevel = true;
 }
 
+void Level::InjectPlayerOrbCountChanged(int newOrbCount)
+{
+	if (this->levelNumber == 2)
+	{
+		if (newOrbCount == 1)
+		{
+			this->shouldAdvanceLevel = true;
+		}
+	}
+}
+
 std::vector<Enemy*>& Level::GetEnemies()
 {
 	return this->enemies;
@@ -75,6 +113,16 @@ std::vector<Enemy*>& Level::GetEnemies()
 std::vector<AreaTrigger*>& Level::GetShrines()
 {
 	return this->areaTriggers;
+}
+
+const ElementType Level::GetStartingElementTypeThisLevel()
+{
+	return this->startingElementType;
+}
+
+const int Level::GetNumberStartingOrbsForThisLevel()
+{
+	return this->startingNumberOfOrbs;
 }
 
 const int Level::GetOrbCapacityForThisLevel()
@@ -87,6 +135,11 @@ const int Level::GetLevelNumber()
 	return this->levelNumber;
 }
 
+const unsigned int Level::GetLevelLoadTime()
+{
+	return this->loadTime;
+}
+
 bool Level::ShouldAdvanceLevel()
 {
 	return this->shouldAdvanceLevel;
@@ -97,9 +150,15 @@ bool Level::ShouldAdvanceLevel()
 #pragma region Private Methods
 
 #pragma region Constructor
-Level::Level(int levelNumber, int orbCapcityForThisLevel) : levelNumber(levelNumber), orbCapacityForPlayer(orbCapcityForThisLevel)
+Level::Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime)
+	: levelNumber(levelNumber), startingNumberOfOrbs(startingNumberOfOrbs), orbCapacityForPlayer(orbCapcityForThisLevel), startingElementType(startingElementType), loadTime(loadTime)
 {
 	shouldAdvanceLevel = false;
+
+	//safety check
+#ifdef _DEBUG
+	assert((startingNumberOfOrbs == 0 && startingElementType == ElementType::NONE) || (startingNumberOfOrbs > 0 && startingElementType != ElementType::NONE));
+#endif
 }
 #pragma endregion
 
@@ -133,70 +192,175 @@ Level::~Level()
 	this->queuedText.clear();
 }
 
-Level* Level::createLevel1()
+Level* Level::createGameOverLevel(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = GAMEOVER_LEVEL_ID;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+	l->queuedText.push_back({ 100, 250, "Gameover... thanks for playing!", 0, -1, Display::FontSize::THIRTYFOUR, false, -1 });
+	return l;
+}
+
+Level* Level::createLevel1(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 1;
 
-	const int whenToShowStory = 1750;
+	const int whenToShowStory = 2000;
 
-	Level* l = new Level(LEVEL_NUMBER, 5);
-	l->queuedText.push_back({ 100, 100, "Welcome to Elemental Balance", 0, -1, Display::FontSize::THIRTYFOUR, false, -1});
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+	l->queuedText.push_back({ 99, 100, "Welcome to Elemental Balance", 0, -1, Display::FontSize::THIRTYFOUR, false, -1});
 
-	l->queuedText.push_back({ 50, 200, "For as long as time can tell, the world has been in peace and",		whenToShowStory,		-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 50, 225, "harmony. This is thanks to the balance of the three elements",		whenToShowStory + 250,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 50, 250, "of creation: Fire, Water, and Earth. However, something has",		whenToShowStory + 500,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 50, 275, "disturbed the eternal harmony of the world and the elements are",	whenToShowStory + 750,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 50, 300, "fighting amongst themselves. Please help restore balance to the",	whenToShowStory + 1000, -1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 50, 325, "elements so that our world may continue to thrive in tranquility.", whenToShowStory + 1250, -1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 225, "For as long as time can tell, the world has been in peace and",		whenToShowStory,		-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 250, "harmony. This is thanks to the balance of the three elements",		whenToShowStory + 750,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 275, "of creation: Fire, Water, and Earth. However, something has",		whenToShowStory + 1500,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 300, "disturbed the eternal harmony of the world and the elements are",	whenToShowStory + 2250,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 325, "fighting amongst themselves. Please help restore balance to the",	whenToShowStory + 3000, -1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 350, "elements so that our world may continue to thrive in tranquility.", whenToShowStory + 3750, -1, Display::FontSize::TWENTY, false, -1 });
 
-	l->queuedText.push_back({ 250, 450, "Press any key to continue...",										whenToShowStory + 3000, -1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 250, 450, "Press any key to continue...",										whenToShowStory + 4500, -1, Display::FontSize::TWENTY, false, -1 });
 	return l;
 }
 
-Level* Level::createLevel2()
+Level* Level::createLevel2(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 2;
 
-	Level* l = new Level(LEVEL_NUMBER, 5);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
 
-	const int waterShrineX = SCREEN_WIDTH / 2;
-	const int waterShrineY = SCREEN_HEIGHT - 40;
+	const int textDelay1 = 1000;
+	const int textDelay2 = 10000;
+	const int textDelay3 = 17500;
+	const int textDelay4 = 23000;
 
-	l->areaTriggers.push_back(new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER));
+	//section 1
+	l->queuedText.push_back({ 341, 250, "This is you...",											textDelay1,				5000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 120, 338, "you can move around with W,A,S,D or the Arrow keys...",	textDelay1 + 2500,		4000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 255, 363, "(or controller D-pad / Stick)...",							textDelay1 + 4250,		3500, Display::FontSize::TWENTY, false, -1 });
 
+	//section 2
+	l->queuedText.push_back({ 140, 225, "You are currently in balance with all the elements...",	textDelay2,				4000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 140, 250, "Which is why you have a neutral color...",					textDelay2 + 2500,		4000, Display::FontSize::TWENTY, false, -1 });
+
+	//section 3
+	l->queuedText.push_back({ 277, 250, "But you can change that...",								textDelay3,				4000, Display::FontSize::TWENTY, false, -1 });
+	
+	//section 4
+	const int waterOrbPositionX = 385;
+	const int waterOrbPositionY = 233;
+	l->queuedText.push_back({ 140, 225, "This is a water orb...",									textDelay4,				6500, Display::FontSize::TWENTY, false, -1 });
+	l->queuedEnemies.push_back({ textDelay4 + 1500, new Enemy(waterOrbPositionX, waterOrbPositionY, waterOrbPositionX, waterOrbPositionY, ElementType::WATER) });
+	l->queuedText.push_back({ 140, 250, "Collecting it will atune you with water...",				textDelay4 + 3000,		5500, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 140, 275, "See for yourself... collect the water orb...",				textDelay4 + 5500,		4500, Display::FontSize::TWENTY, false, -1 });
 
 	return l;
 }
 
-Level* Level::createLevel3()
+Level* Level::createLevel3(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 3;
 
-	Level* l = new Level(LEVEL_NUMBER, 5);
+	Level* l = new Level(LEVEL_NUMBER, 1, 5, WATER, loadTime);
 
-	const int waterShrineX = SCREEN_WIDTH / 2;
-	const int waterShrineY = 40;
-	const int fireShrineX = 40;
-	const int fireShrineY = SCREEN_HEIGHT - 40;
-	const int plantShrineX = SCREEN_WIDTH - 40;
-	const int plantShrineY = SCREEN_HEIGHT - 40;
+	const int textDelay1 = 1000;
+	const int textDelay2 = 1000;
+	const int textDelay3 = 1000;
 
-	l->areaTriggers.push_back(new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER));
-	l->areaTriggers.push_back(new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE));
-	l->areaTriggers.push_back(new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT));
+	//section 1
+	l->queuedText.push_back({ 341, 250, "Nicely done...",											textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 341, 250, "You can only carry so many orbs at once...",				textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 341, 250, "Your current orb count and carrying capacity are",			textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 341, 250, "shown in the upper right corner of the screen.",			textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
 
-	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//section 2
+	l->queuedText.push_back({ 341, 250, "Additionaly, your health is shown in the upper left",		textDelay2,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 341, 250, "corner. If you run out, it's lights out!",					textDelay2,				3000, Display::FontSize::TWENTY, false, -1 });
 
-	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//section 3
+	l->queuedText.push_back({ 341, 250, "If you are carrying more than your capacity, you will",	textDelay3,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 341, 250, "become over-charged and take damage every second!",		textDelay3,				3000, Display::FontSize::TWENTY, false, -1 });
 
 	return l;
 }
+
+Level* Level::createLevel4(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 4;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+
+	l->queuedEnemies.push_back({ 0, new Enemy(100, 100, 100, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(120, 100, 120, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(140, 100, 140, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(160, 100, 160, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(180, 100, 180, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(200, 100, 200, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(220, 100, 220, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(240, 100, 240, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(260, 100, 260, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(280, 100, 280, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(300, 100, 300, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(320, 100, 320, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(340, 100, 340, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(360, 100, 360, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(380, 100, 380, 100, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(100, 120, 100, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(120, 120, 120, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(140, 120, 140, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(160, 120, 160, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(180, 120, 180, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(200, 120, 200, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(220, 120, 220, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(240, 120, 240, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(260, 120, 260, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(280, 120, 280, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(300, 120, 300, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(320, 120, 320, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(340, 120, 340, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(360, 120, 360, 120, ElementType::WATER) });
+	l->queuedEnemies.push_back({ 0, new Enemy(380, 120, 380, 120, ElementType::WATER) });
+
+	return l;
+}
+
+Level* Level::createLevel5(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 5;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+
+	return l;
+}
+
+Level* Level::createLevel6(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 6;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+
+	//const int waterShrineX = SCREEN_WIDTH / 2;
+	//const int waterShrineY = 40;
+	//const int fireShrineX = 40;
+	//const int fireShrineY = SCREEN_HEIGHT - 40;
+	//const int plantShrineX = SCREEN_WIDTH - 40;
+	//const int plantShrineY = SCREEN_HEIGHT - 40;
+
+	//l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER) });
+	//l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE)    });
+	//l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT) });
+
+	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+
+	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+
+	return l;
+}
+
 #pragma endregion

@@ -10,8 +10,9 @@
 
 Game::Game()
 {
-	playerOrbCountTextId = -1;
-	playerHpTextId = -1;
+	this->playerOrbCountTextId = -1;
+	this->playerHpTextId = -1;
+	this->previousFrameEndTime = 0;
 
 	//setup first level
 	this->LoadLevel(1);
@@ -31,19 +32,28 @@ Game::~Game()
 
 void Game::InjectFrame()
 {
+	if (this->currentLevel->ShouldAdvanceLevel())
+	{
+		this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
+		return;
+	}
+
 	Uint32 elapsedTimeInMilliseconds = SDL_GetTicks();
-	this->currentLevel->InjectFrame(elapsedTimeInMilliseconds);
+
+	this->currentLevel->InjectFrame(elapsedTimeInMilliseconds - this->currentLevel->GetLevelLoadTime());
 
 	std::vector<AreaTrigger*>& shrines = this->currentLevel->GetShrines();
 	std::vector<Enemy*>& enemies = this->currentLevel->GetEnemies();
 
 	for (Enemy* const enemy : enemies)
 	{
-		enemy->InjectFrame();
+		enemy->InjectFrame(elapsedTimeInMilliseconds, elapsedTimeInMilliseconds - this->previousFrameEndTime);
 	}
 
-	if(this->player)
-		this->player->InjectFrame();
+	if (this->player)
+	{
+		this->player->InjectFrame(elapsedTimeInMilliseconds, elapsedTimeInMilliseconds - this->previousFrameEndTime);
+	}
 
 	//now that movements are updated check for collisions
 	for (std::vector<Enemy*>::iterator it = enemies.begin(); it != enemies.end();)
@@ -55,6 +65,7 @@ void Game::InjectFrame()
 		{
 			enemyCollision = true;
 			this->player->HandleElementCollision(enemy->GetElementType());
+			this->currentLevel->InjectPlayerOrbCountChanged(this->player->GetOrbCount());
 		}
 
 		for (AreaTrigger* const shrine : shrines)
@@ -91,35 +102,66 @@ void Game::InjectFrame()
 
 	if (this->player)
 	{
+		//check health
+		const int hp = this->player->GetHp();
+		if (hp <= 0)
+		{
+			//game over!
+			this->LoadLevel(GAMEOVER_LEVEL_ID);
+			return;
+		}
+
 		//draw player
 		this->player->Draw();
 
 		//update text controls
 		char hpText[8];
-		sprintf_s(hpText, "%d%%", this->player->GetHp());
-		Display::UpdateText(this->playerHpTextId, hpText);
+		sprintf_s(hpText, "%d%%", hp);
+		SDL_Color hpColor = BLACK;
+		if (hp <= 20)
+		{
+			hpColor = RED;
+		}
+		Display::UpdateText(this->playerHpTextId, hpText, hpColor);
 
+		const int orbCount = this->player->GetOrbCount();
+		const int maxOrbCount = this->player->GetMaxOrbCount();
 		char orbCountText[8];
-		sprintf_s(orbCountText, "x%d/%d", this->player->GetOrbCount(), this->player->GetMaxOrbCount());
-		Display::UpdateText(this->playerOrbCountTextId, orbCountText);
+		sprintf_s(orbCountText, "x%d/%d", orbCount, maxOrbCount);
+		SDL_Color orbCountColor = BLACK;
+		if (this->player->GetIsOvercharged())
+		{
+			orbCountColor = RED;
+		}
+		int x = SCREEN_WIDTH - 62;
+		if (orbCount >= 10)
+		{
+			if (orbCount > 20)
+				x -= 15;	//1's don't take as much space, so non-teens need a bit more
+			else
+				x -= 8;
+		}
+		if (maxOrbCount >= 10)
+		{
+			x -= 8;
+		}
+		Display::MoveText(this->playerOrbCountTextId, x, 2);
+		Display::UpdateText(this->playerOrbCountTextId, orbCountText, orbCountColor);
 	}
 
-	if (this->currentLevel->ShouldAdvanceLevel())
-	{
-		this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
-	}
+	this->previousFrameEndTime = elapsedTimeInMilliseconds;
 }
 
 void Game::InjectKeyDown(int key)
 {
-	this->currentLevel->InjectKeyPress();
-
 	if(this->player)
 		this->player->OnKeyDown(key);
 }
 
 void Game::InjectKeyUp(int key)
 {
+	this->currentLevel->InjectKeyPress();
+
 	if(this->player)
 		this->player->OnKeyUp(key);
 }
@@ -185,8 +227,14 @@ void Game::LoadLevel(int levelNumber)
 
 	delete this->currentLevel;
 
+	if (this->player)
+	{
+		delete this->player;
+		this->player = nullptr;
+	}
+
 	//load in new level
-	this->currentLevel = Level::Load(levelNumber);
+	this->currentLevel = Level::Load(levelNumber, SDL_GetTicks());
 
 	if (this->currentLevel == nullptr)
 	{
@@ -194,13 +242,14 @@ void Game::LoadLevel(int levelNumber)
 		return;
 	}
 
-	//skip gameplay stuff for level 1 since it's just the titlescreen
-	if (levelNumber != 1)
+	//skip gameplay stuff for level 1 since it's just the titlescreen // TODO: Make a not shit solution for this
+	if (levelNumber != 1 && levelNumber != GAMEOVER_LEVEL_ID)
 	{
 		//create the player object
 		this->player = new Player();
 
-		//set player's orb capacity
+		//set player's orb counts
+		this->player->SetOrbCount(this->currentLevel->GetNumberStartingOrbsForThisLevel(), this->currentLevel->GetStartingElementTypeThisLevel());
 		this->player->SetMaxOrbCount(this->currentLevel->GetOrbCapacityForThisLevel());
 
 		//create text controls for the UI

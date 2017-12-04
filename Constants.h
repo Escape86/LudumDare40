@@ -3,7 +3,6 @@
 #pragma region Filepaths
 #define BLUE_CIRCLE_TEXTURE_PATH	"resources/Shrine_Water.png"
 #define BLUE_DOT_TEXTURE_PATH		"resources/Orb_Water.png"
-#define BLACK_CIRCLE_TEXTURE_PATH	"resources/black_circle.bmp"
 #define BLACK_DOT_TEXTURE_PATH		"resources/Orb_Neutral.png"
 #define GREEN_CIRCLE_TEXTURE_PATH	"resources/Shrine_Plant.png"
 #define GREEN_DOT_TEXTURE_PATH		"resources/Orb_Plant.png"
@@ -28,3 +27,5 @@
 #define ENEMY_VELOCITY				1
 
 #define JOYSTICK_DEAD_ZONE			8000
+
+#define GAMEOVER_LEVEL_ID			-999

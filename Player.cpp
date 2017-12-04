@@ -3,6 +3,8 @@
 #include "Display.h"
 #include "Constants.h"
 
+const int OverChargeTimerDuration = 1000;
+
 #pragma region Constructor
 
 Player::Player() : Object((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), BLACK_DOT_TEXTURE_PATH, ElementType::NONE)
@@ -12,6 +14,8 @@ Player::Player() : Object((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), BLACK_DOT_TEX
 
 	this->orbCount = 0;
 	this->hp = 100;
+	this->isOvercharged = false;
+	this->overchargeTimer = 0;
 
 	this->overlayTexture = new Texture(PLAYER_OVERLAY_TEXTURE_PATH);
 	this->overlayTexture->Load();
@@ -19,6 +23,9 @@ Player::Player() : Object((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), BLACK_DOT_TEX
 	//TODO: pulling this from texture size is probably not ideal
 	this->width = this->overlayTexture->GetWidth();
 	this->height = this->overlayTexture->GetHeight();
+
+	//prevent level switching from causing keyups to occur without a corresponding keydown
+	this->keydownPrimed = false;
 }
 
 #pragma endregion
@@ -42,7 +49,7 @@ void Player::Draw()
 	Display::QueueTextureForRendering(this->overlayTexture, this->x, this->y);
 }
 
-void Player::InjectFrame()
+void Player::InjectFrame(unsigned int elapsedGameTime, unsigned int previousFrameTime)
 {
 	//update position
 	this->x += this->horizontalVelocity;
@@ -68,6 +75,38 @@ void Player::InjectFrame()
 	else if (this->y + halfHeight > SCREEN_HEIGHT)
 	{
 		this->y = SCREEN_HEIGHT - halfHeight;
+	}
+
+	//are we overcharged?
+	if (this->isOvercharged)
+	{
+		//are we still under overcharged conditions?
+		if (this->orbCount > this->maxOrbCount)
+		{
+			//yes, so decrement timer and/or punish player
+			this->overchargeTimer -= previousFrameTime;
+
+			if (this->overchargeTimer <= 0)
+			{
+				this->hp -= (this->orbCount - this->maxOrbCount);
+				this->overchargeTimer = OverChargeTimerDuration;
+			}
+		}
+		else
+		{
+			//cleared!
+			this->isOvercharged = false;
+			this->overchargeTimer = 0;
+		}
+	}
+	else
+	{
+		//check if we should be considered overcharged
+		if (this->orbCount > this->maxOrbCount)
+		{
+			this->isOvercharged = true;
+			this->overchargeTimer = OverChargeTimerDuration;
+		}
 	}
 }
 
@@ -103,10 +142,15 @@ void Player::OnKeyDown(int key)
 		this->horizontalVelocity = PLAYER_VELOCITY;
 	else if (this->horizontalVelocity < -PLAYER_VELOCITY)
 		this->horizontalVelocity = -PLAYER_VELOCITY;
+
+	this->keydownPrimed = true;
 }
 
 void Player::OnKeyUp(int key)
 {
+	if (!this->keydownPrimed)
+		return;
+
 	switch (key)
 	{
 		case SDLK_w:
@@ -197,8 +241,9 @@ int Player::GetOrbCount()
 	return this->orbCount;
 }
 
-void Player::SetOrbCount(int value)
+void Player::SetOrbCount(int value, ElementType type)
 {
+	this->type = type;
 	this->orbCount = value;
 }
 
@@ -210,6 +255,11 @@ int Player::GetMaxOrbCount()
 void Player::SetMaxOrbCount(int value)
 {
 	this->maxOrbCount = value;
+}
+
+bool Player::GetIsOvercharged()
+{
+	return this->isOvercharged;
 }
 
 int Player::GetHp()

@@ -10,7 +10,7 @@ public:
 
 	void Draw() override;
 
-	void InjectFrame() override;
+	void InjectFrame(unsigned int elapsedGameTime, unsigned int previousFrameTime) override;
 	void OnKeyDown(int key);
 	void OnKeyUp(int key);
 
@@ -19,9 +19,10 @@ public:
 
 	void HandleElementCollision(ElementType typeFromCollision);
 	int GetOrbCount();
-	void SetOrbCount(int value);
+	void SetOrbCount(int value, ElementType type);
 	int GetMaxOrbCount();
 	void SetMaxOrbCount(int value);
+	bool GetIsOvercharged();
 
 	int GetHp();
 	void SetHp(int hp);
@@ -33,6 +34,11 @@ private:
 	int orbCount;
 	int maxOrbCount;
 	int hp;
+
+	bool isOvercharged;
+	int overchargeTimer;
+
+	bool keydownPrimed;
 
 	Texture* overlayTexture;
 };

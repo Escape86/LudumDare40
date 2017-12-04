@@ -8,5 +8,5 @@ public:
 	AreaTrigger(int x, int y, ElementType type);
 	~AreaTrigger();
 
-	void InjectFrame() override;
+	void InjectFrame(unsigned int elapsedGameTime, unsigned int previousFrameTime) override;
 };

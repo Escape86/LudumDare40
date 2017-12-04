@@ -182,13 +182,14 @@ int Display::CreateText(std::string text, int x, int y, Display::FontSize fontSi
 	return id;
 }
 
-bool Display::UpdateText(int id, std::string text)
+bool Display::UpdateText(int id, std::string text, SDL_Color textColor /*= { 0, 0, 0 }*/)
 {
 	for (QueuedText& qt : Display::textQueue)
 	{
 		if (qt.id == id)
 		{
 			qt.text = text;
+			qt.textColor = textColor;
 			return true;
 		}
 	}

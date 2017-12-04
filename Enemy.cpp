@@ -18,7 +18,7 @@ Enemy::~Enemy()
 
 }
 
-void Enemy::InjectFrame()
+void Enemy::InjectFrame(unsigned int elapsedGameTime, unsigned int previousFrameTime)
 {
 	double x1 = this->x;
 	double x2 = this->targetX;

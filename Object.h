@@ -13,7 +13,7 @@ public:
 	Object(double x, double y, std::string texturePath, ElementType type);
 	virtual ~Object();
 
-	virtual void InjectFrame() = 0;
+	virtual void InjectFrame(unsigned int elapsedGameTime, unsigned int previousFrameTime) = 0;
 
 	virtual void Draw();
 
