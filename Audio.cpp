@@ -20,9 +20,6 @@ bool Audio::Initialize()
 		Audio::audioTrackData[track.first] = Mix_LoadWAV(track.second);
 	}
 
-	//set volume
-	Mix_Volume(-1, MIX_MAX_VOLUME / 4);
-
 	return true;
 }
 

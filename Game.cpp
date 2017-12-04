@@ -186,6 +186,9 @@ void Game::InjectKeyUp(int key)
 
 void Game::InjectControllerStickMovement(unsigned char axis, short value)
 {
+	if (!this->player)
+		return;
+
 	//X axis motion
 	if (axis == 0)
 	{
