@@ -407,30 +407,34 @@ Level* Level::createLevel6(unsigned int loadTime)
 
 	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
 
-	l->queuedText.push_back({ 240, 100, "Level 6",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 190, 100, "Protect the Earth Shrine from Fire Orbs",	textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
 
-	//const int waterShrineX = SCREEN_WIDTH / 2;
-	//const int waterShrineY = 40;
-	//const int fireShrineX = 40;
-	//const int fireShrineY = SCREEN_HEIGHT - 40;
-	//const int plantShrineX = SCREEN_WIDTH - 40;
-	//const int plantShrineY = SCREEN_HEIGHT - 40;
+	const int fireShrineX = 40;
+	const int fireShrineY = SCREEN_HEIGHT - 40;
+	const int plantShrineX = SCREEN_WIDTH - 40;
+	const int plantShrineY = SCREEN_HEIGHT - 40;
 
-	//l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER) });
-	//l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE)    });
-	//l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT) });
+	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(fireShrineX, fireShrineY, ElementType::FIRE)    });
+	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT) });
 
-	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 0, new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//friendly orbs
+	int x1 = 300; int y1 = 200; const int x1Offset = 50;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += x1Offset;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += x1Offset;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += x1Offset;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) }); x1 += x1Offset;
+	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, x1, y1, ElementType::WATER) });
 
-	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX - 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 0,  waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 25, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
-	//l->queuedEnemies.push_back({ 1000, new Enemy(waterShrineX + 50, waterShrineY + 100, fireShrineX, fireShrineY, ElementType::WATER) });
+	//attacking orbs
+	for (unsigned int i = 1; i < 10; i++)
+	{
+		int x2 = 100; int y2 = 400; const int x2Offset = 50;
+		l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+		l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+		l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+		l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
+		l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) });
+	}
 
 	return l;
 }

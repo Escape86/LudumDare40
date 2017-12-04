@@ -85,7 +85,7 @@ void Game::InjectFrame()
 			if (shrine->TestCollision(enemy))
 			{
 				//enemy reach an area trigger
-				this->player->SetHp(this->player->GetHp() - 1);
+				this->player->SetHp(this->player->GetHp() - ENEMY_REACHES_SHRINE_HP_COST);
 				enemyCollision = true;
 			}
 		}

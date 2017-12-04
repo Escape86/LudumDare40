@@ -222,7 +222,7 @@ void Player::HandleOrbCollision(ElementType typeFromCollision)
 	//check if we collided with our element's weakness
 	if (ELEMENTTYPE_WEAKNESS[this->type] == typeFromCollision)
 	{
-		this->hp -= 10;
+		this->hp -= PLAYER_TOUCHES_ENEMY_ORB_HP_COST;
 		this->orbCount--;
 		Audio::PlayAudio(Audio::AudioTracks::DESTROY_ORB);
 	}
