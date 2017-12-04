@@ -17,11 +17,12 @@ public:
 	
 	~Level();
 
-	void InjectFrame(unsigned int elapsedGameTimeInMilliseconds);
+	void InjectFrame(unsigned int elapsedLevelTimeInMilliseconds);
 	void InjectKeyDown();
 	void InjectKeyUp();
 	void InjectPlayerOrbCountChanged(int newOrbCount);
 	void InjectPlayerBroughtOrbToShrine(ElementType orbType, ElementType shrineType, int orbCount);
+	void InjectLevelEndTransitionBegin(unsigned int elapsedLevelTimeInMilliseconds);
 
 	std::vector<Enemy*>& GetEnemies();
 	std::vector<AreaTrigger*>& GetShrines();
@@ -31,6 +32,7 @@ public:
 	const int GetOrbCapacityForThisLevel();
 	const int GetLevelNumber();
 	const unsigned int GetLevelLoadTime();
+	const bool GetUseTransition();
 
 	bool ShouldAdvanceLevel();
 
@@ -53,7 +55,7 @@ private:
 	static Level* createLevel13(unsigned int loadTime);
 	static Level* createLevel14(unsigned int loadTime);
 
-	Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime, bool advancesOnKeyPress);
+	Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime, bool advancesOnKeyPress, bool useTransition);
 
 	std::vector<Enemy*> enemies;
 	std::vector<AreaTrigger*> areaTriggers;
@@ -66,6 +68,7 @@ private:
 	const bool advancesOnKeyPress;
 	bool isKeyDownPrimed;
 	int returnedOrbCount;
+	bool useTransition;
 
 	struct QueuedEnemy
 	{

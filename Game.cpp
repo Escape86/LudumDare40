@@ -13,6 +13,8 @@ Game::Game()
 	this->playerOrbCountTextId = -1;
 	this->playerHpTextId = -1;
 	this->previousFrameEndTime = 0;
+	this->levelEndTimer = 0;
+	this->isLevelEnding = false;
 
 	//setup first level
 	this->LoadLevel(0);
@@ -27,15 +29,42 @@ Game::~Game()
 	if (this->player)
 	{
 		delete this->player;
+		this->player = nullptr;
 	}
 }
 
 void Game::InjectFrame()
 {
-	if (this->currentLevel->ShouldAdvanceLevel())
+	Uint32 elapsedTimeInMilliseconds = SDL_GetTicks();
+
+	if(this->isLevelEnding)
 	{
-		this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
-		return;
+		if (this->levelEndTimer <= 0)
+		{
+			this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
+			return;
+		}
+		else
+		{
+			this->levelEndTimer -= (elapsedTimeInMilliseconds - this->previousFrameEndTime);
+		}
+	}
+	else
+	{
+		if (this->currentLevel->ShouldAdvanceLevel())
+		{
+			if (this->currentLevel->GetUseTransition())
+			{
+				this->isLevelEnding = true;
+				this->levelEndTimer = LEVEL_END_TRANSITION_DURATION;
+				this->currentLevel->InjectLevelEndTransitionBegin(elapsedTimeInMilliseconds - this->currentLevel->GetLevelLoadTime());
+			}
+			else
+			{
+				this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
+				return;
+			}
+		}
 	}
 
 	if (this->player)
@@ -49,8 +78,6 @@ void Game::InjectFrame()
 			return;
 		}
 	}
-
-	Uint32 elapsedTimeInMilliseconds = SDL_GetTicks();
 
 	this->currentLevel->InjectFrame(elapsedTimeInMilliseconds - this->currentLevel->GetLevelLoadTime());
 
@@ -287,6 +314,9 @@ void Game::LoadLevel(int levelNumber)
 		playerOrbCountTextId = Display::CreateText("", SCREEN_WIDTH - 62, 2, Display::FontSize::TWENTY, BLACK);
 		playerHpTextId = Display::CreateText("", 2, 2, Display::FontSize::TWENTY, BLACK);
 	}
+
+	this->isLevelEnding = false;
+	this->levelEndTimer = 0;
 }
 
 #pragma endregion

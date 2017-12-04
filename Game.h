@@ -26,4 +26,7 @@ private:
 	int playerHpTextId;
 
 	unsigned int previousFrameEndTime;
+
+	bool isLevelEnding;
+	int levelEndTimer;
 };

@@ -52,12 +52,12 @@ Level* Level::Load(int levelNumber, unsigned int loadTime)
 	}
 }
 
-void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
+void Level::InjectFrame(unsigned int elapsedLevelTimeInMilliseconds)
 {
 	//spawn any enemies that are ready
 	for (std::vector<QueuedEnemy>::iterator it = this->queuedEnemies.begin(); it != this->queuedEnemies.end();)
 	{
-		if (elapsedGameTimeInMilliseconds >= it->spawnTime)
+		if (elapsedLevelTimeInMilliseconds >= it->spawnTime)
 		{
 			this->enemies.push_back(it->enemy);
 			it = this->queuedEnemies.erase(it);
@@ -70,7 +70,7 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 	//spawn any shrines that are ready
 	for (std::vector<QueuedAreaTrigger>::iterator it = this->queuedAreaTriggers.begin(); it != this->queuedAreaTriggers.end();)
 	{
-		if (elapsedGameTimeInMilliseconds >= it->spawnTime)
+		if (elapsedLevelTimeInMilliseconds >= it->spawnTime)
 		{
 			this->areaTriggers.push_back(it->areaTrigger);
 			it = this->queuedAreaTriggers.erase(it);
@@ -85,7 +85,7 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 	{
 		if (it->isBeingShown)
 		{
-			if (it->durationToShow > -1 && elapsedGameTimeInMilliseconds >= (it->whenToShow + it->durationToShow))
+			if (it->durationToShow > -1 && elapsedLevelTimeInMilliseconds >= (it->whenToShow + it->durationToShow))
 			{
 				//text is expired, remove it
 				Display::RemoveText(it->idFromCreation);
@@ -95,7 +95,7 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 		}
 		else
 		{
-			if (elapsedGameTimeInMilliseconds >= it->whenToShow)
+			if (elapsedLevelTimeInMilliseconds >= it->whenToShow)
 			{
 				//time to show the text
 				it->idFromCreation = Display::CreateText(it->text, it->x, it->y, it->fontSize, it->fontColor);
@@ -111,7 +111,7 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 	{
 		if (it->isBeingShown)
 		{
-			if (it->durationToShow > -1 && elapsedGameTimeInMilliseconds >= (it->whenToShow + it->durationToShow))
+			if (it->durationToShow > -1 && elapsedLevelTimeInMilliseconds >= (it->whenToShow + it->durationToShow))
 			{
 				//texture is expired, remove it
 				it = this->queuedTextures.erase(it);
@@ -123,7 +123,7 @@ void Level::InjectFrame(unsigned int elapsedGameTimeInMilliseconds)
 		}
 		else
 		{
-			if (elapsedGameTimeInMilliseconds >= it->whenToShow)
+			if (elapsedLevelTimeInMilliseconds >= it->whenToShow)
 			{
 				//time to show it
 				it->isBeingShown = true;
@@ -194,6 +194,22 @@ void Level::InjectPlayerBroughtOrbToShrine(ElementType orbType, ElementType shri
 		this->returnedOrbCount += orbCount;
 }
 
+void Level::InjectLevelEndTransitionBegin(unsigned int elapsedLevelTimeInMilliseconds)
+{
+	//remove any other text from the screen that the level may be showing
+	for (QueuedText& qt : this->queuedText)
+	{
+		if (qt.isBeingShown)
+		{
+			Display::RemoveText(qt.idFromCreation);
+		}
+	}
+	this->queuedText.clear();
+
+	//pseudo random text (lols)
+	this->queuedText.push_back({ 100, 250, elapsedLevelTimeInMilliseconds % 2 == 1 ? "Nice work!" : "Nicely done!", elapsedLevelTimeInMilliseconds + 1000, 2000, Display::FontSize::THIRTYFOUR, false, -1 });
+}
+
 std::vector<Enemy*>& Level::GetEnemies()
 {
 	return this->enemies;
@@ -229,6 +245,11 @@ const unsigned int Level::GetLevelLoadTime()
 	return this->loadTime;
 }
 
+const bool Level::GetUseTransition()
+{
+	return this->useTransition;
+}
+
 bool Level::ShouldAdvanceLevel()
 {
 	return this->shouldAdvanceLevel;
@@ -239,8 +260,8 @@ bool Level::ShouldAdvanceLevel()
 #pragma region Private Methods
 
 #pragma region Constructor
-Level::Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime, bool advancesOnKeyPress)
-	: levelNumber(levelNumber), startingNumberOfOrbs(startingNumberOfOrbs), orbCapacityForPlayer(orbCapcityForThisLevel), startingElementType(startingElementType), loadTime(loadTime), advancesOnKeyPress(advancesOnKeyPress)
+Level::Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime, bool advancesOnKeyPress, bool useTransition)
+	: levelNumber(levelNumber), startingNumberOfOrbs(startingNumberOfOrbs), orbCapacityForPlayer(orbCapcityForThisLevel), startingElementType(startingElementType), loadTime(loadTime), advancesOnKeyPress(advancesOnKeyPress), useTransition(useTransition)
 {
 	this->shouldAdvanceLevel = false;
 	this->isKeyDownPrimed = false;
@@ -294,7 +315,7 @@ Level* Level::createGameOverLevel(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = GAMEOVER_LEVEL_ID;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, false);
 	l->queuedText.push_back({ 100, 250, "Gameover... thanks for playing!", 0, -1, Display::FontSize::THIRTYFOUR, false, -1 });
 	return l;
 }
@@ -305,7 +326,7 @@ Level* Level::createLevel0(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 0, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 0, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/Title.png");
 	bool loaded = t->Load();
@@ -322,7 +343,7 @@ Level* Level::createLevel1(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 	l->queuedText.push_back({ 55, 225, "For as long as time can tell, the world has been in peace and",		textDelay,			-1, Display::FontSize::TWENTY, false, -1 });
 	l->queuedText.push_back({ 55, 250, "harmony. This is thanks to the balance of the three elements",		textDelay + 750,	-1, Display::FontSize::TWENTY, false, -1 });
 	l->queuedText.push_back({ 55, 275, "of creation: Fire, Water, and Earth. However, something has",		textDelay + 1500,	-1, Display::FontSize::TWENTY, false, -1 });
@@ -340,7 +361,7 @@ Level* Level::createLevel2(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/Controls.png");
 	bool loaded = t->Load();
@@ -358,7 +379,7 @@ Level* Level::createLevel3(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/Elements.png");
 	bool loaded = t->Load();
@@ -376,7 +397,7 @@ Level* Level::createLevel4(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/Goal.png");
 	bool loaded = t->Load();
@@ -395,7 +416,7 @@ Level* Level::createLevel5(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/OrbLimit1.png");
 	bool loaded = t->Load();
@@ -411,7 +432,7 @@ Level* Level::createLevel6(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 6;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, true);
 
 	const int textDelay = 1000;
 
@@ -431,7 +452,7 @@ Level* Level::createLevel7(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/OrbLimit2.png");
 	bool loaded = t->Load();
@@ -451,7 +472,7 @@ Level* Level::createLevel8(unsigned int loadTime)
 	const int waterShrineX = SCREEN_WIDTH - 40;
 	const int waterShrineY = SCREEN_HEIGHT - 40;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, true);
 
 	//section 1
 	l->queuedText.push_back({ 100, 200, "Collect the orbs and return them to the shrine...",	textDelay,				-1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -472,7 +493,7 @@ Level* Level::createLevel9(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/Weakness.png");
 	bool loaded = t->Load();
@@ -490,7 +511,7 @@ Level* Level::createLevel10(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/Weakness2.png");
 	bool loaded = t->Load();
@@ -506,7 +527,7 @@ Level* Level::createLevel11(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 11;
 
-	Level* l = new Level(LEVEL_NUMBER, 1, 5, WATER, loadTime, false);
+	Level* l = new Level(LEVEL_NUMBER, 1, 5, WATER, loadTime, false, true);
 
 	const int textDelay = 1000;
 
@@ -525,7 +546,7 @@ Level* Level::createLevel12(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 
 	Texture* t = new Texture("resources/GoalInfo.png");
 	bool loaded = t->Load();
@@ -543,7 +564,7 @@ Level* Level::createLevel13(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, true);
 
 	//section 1
 	l->queuedText.push_back({ 240, 100, "Remove all orbs from the field...",	textDelay,				-1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -586,7 +607,7 @@ Level* Level::createLevel14(unsigned int loadTime)
 
 	const int textDelay = 1000;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false);
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, true);
 
 	l->queuedText.push_back({ 190, 100, "Protect the Earth Shrine from Fire Orbs",	textDelay,				-1, Display::FontSize::TWENTY, false, -1, BLACK });
 
