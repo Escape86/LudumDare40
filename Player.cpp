@@ -245,6 +245,9 @@ void Player::SetOrbCount(int value, ElementType type)
 {
 	this->type = type;
 	this->orbCount = value;
+
+	//destroy old texture and replace with new one that matches our new element type
+	this->SetTexture(ELEMENTTYPE_TO_DOT_TEXTURE[this->type]);
 }
 
 int Player::GetMaxOrbCount()

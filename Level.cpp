@@ -96,9 +96,17 @@ void Level::InjectKeyPress()
 
 void Level::InjectPlayerOrbCountChanged(int newOrbCount)
 {
+	//ghetto place to put level change logic... totally a hack :(
 	if (this->levelNumber == 2)
 	{
 		if (newOrbCount == 1)
+		{
+			this->shouldAdvanceLevel = true;
+		}
+	}
+	else if (this->levelNumber == 3)
+	{
+		if (newOrbCount == 0)
 		{
 			this->shouldAdvanceLevel = true;
 		}
@@ -262,22 +270,57 @@ Level* Level::createLevel3(unsigned int loadTime)
 	Level* l = new Level(LEVEL_NUMBER, 1, 5, WATER, loadTime);
 
 	const int textDelay1 = 1000;
-	const int textDelay2 = 1000;
-	const int textDelay3 = 1000;
+	const int textDelay2 = 14000;
+	const int textDelay3 = 23000;
+	const int textDelay4 = 35000;
+	const int textDelay5 = 51000;
+	const int textDelay6 = 65000;
+	const int textDelay7 = 81000;
+
+	const int fireOrbPositionX = 700;
+	const int fireOrbPositionY = 332;
 
 	//section 1
-	l->queuedText.push_back({ 341, 250, "Nicely done...",											textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 341, 250, "You can only carry so many orbs at once...",				textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 341, 250, "Your current orb count and carrying capacity are",			textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 341, 250, "shown in the upper right corner of the screen.",			textDelay1,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 330, 200, "Nicely done...",											textDelay1,				6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 150, 225, "You can only carry so many orbs at once...",				textDelay1 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 150, 250, "Your current orb count and carrying capacity are",			textDelay1 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 150, 275, "shown in the upper right corner of the screen.",			textDelay1 + 5000,		6000, Display::FontSize::TWENTY, false, -1 });
 
 	//section 2
-	l->queuedText.push_back({ 341, 250, "Additionaly, your health is shown in the upper left",		textDelay2,				3000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 341, 250, "corner. If you run out, it's lights out!",					textDelay2,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 250, "Additionaly, your health is shown in the upper left...",	textDelay2,				6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 275, "If it reaches zero, it's lights out!",						textDelay2 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
 
 	//section 3
-	l->queuedText.push_back({ 341, 250, "If you are carrying more than your capacity, you will",	textDelay3,				3000, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 341, 250, "become over-charged and take damage every second!",		textDelay3,				3000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 250, "If you are carrying more than your capacity, you will",	textDelay3,				6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 275, "become over-charged and take damage every second!",		textDelay3 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 300, "The more over-charged you are, the more damage you take,",	textDelay3 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 325, "so be careful.",											textDelay3 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
+
+	//section 4
+	l->queuedText.push_back({ 100, 250, "You can only be attuned to one element at a time...",		textDelay4,				6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 275, "When you are neutral, picking up any orb will attune you",	textDelay4 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 300, "to the orb's element. If you are already attuned, then",	textDelay4 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 325, "picking up a different type of orb will have a different",	textDelay4 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 350, "effect depending on its type.",							textDelay4 + 8000,		6000, Display::FontSize::TWENTY, false, -1 });
+
+	//section 5
+	l->queuedText.push_back({ 100, 250, "Each element is weak against another element:",			textDelay5,				6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 275, "Fire is weak to Water",									textDelay5 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 300, "Water is weak to Earth",									textDelay5 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 325, "Earth is weak to Fire",									textDelay5 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
+
+	//section 6
+	l->queuedText.push_back({ 100, 250, "If the orb you touch is weak to an orb your're",			textDelay6,				6500, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 275, "carrying, they will destroy each other. However if your",	textDelay6 + 2000,		6500, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 300, " orb is weak to the type you touch, then they will",		textDelay6 + 4000,		6500, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 325, " destroy each other and damage you in the process!",		textDelay6 + 6000,		6500, Display::FontSize::TWENTY, false, -1 });
+
+	//section 7
+	l->queuedText.push_back({ 100, 250, "This is a good way to eliminate orbs on the field while",	textDelay7,				6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 275, "also preventing yourself from becoming overcharged!",		textDelay7 + 2000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 300, "Try it for yourself... you currently hold a water orb",	textDelay7 + 4000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 100, 325, "which means fire is weak to you. Attack this fire orb!",	textDelay7 + 6000,		6000, Display::FontSize::TWENTY, false, -1 });
+	l->queuedEnemies.push_back({ textDelay7 + 7500, new Enemy(fireOrbPositionX, fireOrbPositionY, fireOrbPositionX, fireOrbPositionY, ElementType::FIRE) });
 
 	return l;
 }
@@ -286,7 +329,12 @@ Level* Level::createLevel4(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 4;
 
+	const int textDelay1 = 1000;
+
 	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime);
+
+	//section 1
+	l->queuedText.push_back({ 330, 200, "Level 4",													textDelay1,				-1, Display::FontSize::TWENTY, false, -1 });
 
 	l->queuedEnemies.push_back({ 0, new Enemy(100, 100, 100, 100, ElementType::WATER) });
 	l->queuedEnemies.push_back({ 0, new Enemy(120, 100, 120, 100, ElementType::WATER) });
