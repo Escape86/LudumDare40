@@ -57,6 +57,7 @@ private:
 	static Level* createLevel15(unsigned int loadTime);
 	static Level* createLevel16(unsigned int loadTime);
 	static Level* createLevel17(unsigned int loadTime);
+	static Level* createLevel18(unsigned int loadTime);
 
 	Level(int levelNumber, int startingNumberOfOrbs, int orbCapcityForThisLevel, ElementType startingElementType, unsigned int loadTime, bool advancesOnKeyPress, bool useTransition);
 

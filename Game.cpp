@@ -16,9 +16,10 @@ Game::Game()
 	this->previousFrameEndTime = 0;
 	this->levelEndTimer = 0;
 	this->isLevelEnding = false;
+	this->lastLevelNumber = 0;
 
 	//setup first level
-	this->LoadLevel(14);
+	this->LoadLevel(18);
 }
 
 #pragma endregion
@@ -42,7 +43,19 @@ void Game::InjectFrame()
 	{
 		if (this->levelEndTimer <= 0)
 		{
-			this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
+			int currentLevelNumber = this->currentLevel->GetLevelNumber();
+
+			int nextLevelNumber;
+			if (currentLevelNumber == GAMEOVER_LEVEL_ID)
+			{
+				nextLevelNumber = this->lastLevelNumber;
+			}
+			else
+			{
+				nextLevelNumber = currentLevelNumber + 1;
+			}
+
+			this->LoadLevel(nextLevelNumber);
 			return;
 		}
 		else
@@ -62,7 +75,19 @@ void Game::InjectFrame()
 			}
 			else
 			{
-				this->LoadLevel(this->currentLevel->GetLevelNumber() + 1);
+				int currentLevelNumber = this->currentLevel->GetLevelNumber();
+
+				int nextLevelNumber;
+				if (currentLevelNumber == GAMEOVER_LEVEL_ID)
+				{
+					nextLevelNumber = this->lastLevelNumber;
+				}
+				else
+				{
+					nextLevelNumber = currentLevelNumber + 1;
+				}
+
+				this->LoadLevel(nextLevelNumber);
 				return;
 			}
 		}
@@ -289,6 +314,11 @@ void Game::InjectControllerStickMovement(unsigned char axis, short value)
 
 void Game::LoadLevel(int levelNumber)
 {
+	if (this->currentLevel)
+	{
+		this->lastLevelNumber = this->currentLevel->GetLevelNumber();
+	}
+
 	//clear previous level stuff
 	if (playerOrbCountTextId >= 0)
 	{
@@ -320,7 +350,8 @@ void Game::LoadLevel(int levelNumber)
 	}
 
 	//skip gameplay stuff for level 1 since it's just the titlescreen // TODO: Make a not shit solution for this!!!
-	if (levelNumber != TITLE_LEVEL_ID &&	//0
+	if (levelNumber != GAMEOVER_LEVEL_ID &&	//-999
+		levelNumber != TITLE_LEVEL_ID &&	//0
 		levelNumber != STORY_LEVEL_ID &&	//1
 		levelNumber != 2 &&
 		levelNumber != 3 &&
@@ -330,7 +361,8 @@ void Game::LoadLevel(int levelNumber)
 		levelNumber != 9 &&
 		levelNumber != 10 &&
 		levelNumber != 12 &&
-		levelNumber != 15
+		levelNumber != 15 &&
+		levelNumber != 18
 		)
 	{
 		//create the player object

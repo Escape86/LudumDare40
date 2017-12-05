@@ -49,6 +49,8 @@ Level* Level::Load(int levelNumber, unsigned int loadTime)
 			return createLevel16(loadTime);
 		case 17:
 			return createLevel17(loadTime);
+		case 18:
+			return createLevel18(loadTime);
 
 		case GAMEOVER_LEVEL_ID:
 			return createGameOverLevel(loadTime);
@@ -142,7 +144,7 @@ void Level::InjectFrame(unsigned int elapsedLevelTimeInMilliseconds)
 		++it;
 	}
 
-	if (this->levelNumber == 13 || this->levelNumber == 14 || this->levelNumber == 16)
+	if (this->levelNumber == 13 || this->levelNumber == 14 || this->levelNumber == 16 || this->levelNumber == 17)
 	{
 		if (this->queuedEnemies.size() == 0 && this->enemies.size() == 0)
 		{
@@ -321,8 +323,8 @@ Level* Level::createGameOverLevel(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = GAMEOVER_LEVEL_ID;
 
-	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, false);
-	l->queuedText.push_back({ 100, 250, "Gameover... thanks for playing!", 0, -1, Display::FontSize::THIRTYFOUR, false, -1 });
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
+	l->queuedText.push_back({ 100, 250, "Gameover... Press any key to retry this level!", 0, -1, Display::FontSize::TWENTY, false, -1 });
 	return l;
 }
 
@@ -351,13 +353,13 @@ Level* Level::createLevel1(unsigned int loadTime)
 
 	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, true, false);
 	l->queuedText.push_back({ 55, 225, "For as long as time can tell, the world has been in peace and",		textDelay,			-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 250, "harmony. This is thanks to the balance of the three elements",		textDelay + 750,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 275, "of creation: Fire, Water, and Earth. However, something has",		textDelay + 1500,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 300, "disturbed the eternal harmony of the world and the elements are",	textDelay + 2250,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 325, "fighting amongst themselves. Please help restore balance to the",	textDelay + 3000,	-1, Display::FontSize::TWENTY, false, -1 });
-	l->queuedText.push_back({ 55, 350, "elements so that our world may continue to thrive in tranquility.", textDelay + 3750,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 250, "harmony. This is thanks to the balance of the three elements",		textDelay,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 275, "of creation: Fire, Water, and Earth. However, something has",		textDelay,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 300, "disturbed the eternal harmony of the world and the elements are",	textDelay,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 325, "fighting amongst themselves. Please help restore balance to the",	textDelay,	-1, Display::FontSize::TWENTY, false, -1 });
+	l->queuedText.push_back({ 55, 350, "elements so that our world may continue to thrive in tranquility.", textDelay,	-1, Display::FontSize::TWENTY, false, -1 });
 
-	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
+	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay + 1000, -1, Display::FontSize::TWENTY, false, -1, BLACK });
 	return l;
 }
 
@@ -720,7 +722,7 @@ Level* Level::createLevel16(unsigned int loadTime)
 	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::WATER) });	x4 -= stepAmountX4; y4 += stepAmountY4;
 	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::WATER) });	x4 -= stepAmountX4; y4 += stepAmountY4;
 	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::FIRE) });	x4 -= stepAmountX4; y4 += stepAmountY4;
-	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::FIRE) });
+	l->queuedEnemies.push_back({ 0, new Enemy(x4, y4, x4, y4, ElementType::PLANT) });
 
 	//section 5
 	int x5 = 160; int y5 = 575;
@@ -754,11 +756,22 @@ Level* Level::createLevel17(unsigned int loadTime)
 {
 	const int LEVEL_NUMBER = 17;
 
-	const int textDelay = 1000;
+	const int textDelay = 500;
+	const int orbWaveDelay1 = 1000;
+	const int orbWaveDelay2 = 5000;
+	const int orbWaveDelay3 = 10000;
+	const int orbWaveDelay4 = 16000;
+	const int orbWaveDelay5 = 25000;
+	const int orbWaveDelay6 = 26000;
+	const int orbWaveDelay7 = 31000;
+	const int orbWaveDelay8 = 36500;
+	const int orbWaveDelay9 = 42000;
+	const int orbWaveDelay10 = 46500;
+	const int orbWaveDelay11 = 50000;
 
 	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, true);
 
-	l->queuedText.push_back({ 190, 100, "Protect the Shrines...",	textDelay,				3000, Display::FontSize::TWENTY, false, -1, BLACK });
+	l->queuedText.push_back({ 190, 100, "Protect the Shrines...",	textDelay,				4000, Display::FontSize::TWENTY, false, -1, BLACK });
 
 	const int fireShrineX = SCREEN_WIDTH - 40;
 	const int fireShrineY = (SCREEN_HEIGHT / 2) - 20;
@@ -771,26 +784,139 @@ Level* Level::createLevel17(unsigned int loadTime)
 	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(plantShrineX, plantShrineY, ElementType::PLANT) });
 	l->queuedAreaTriggers.push_back({ 0, new AreaTrigger(waterShrineX, waterShrineY, ElementType::WATER) });
 
-	//section 1
-	int x1 = 300; int y1 = 500; const int stepAmountX1 = 20; const int stepAmountY1 = 15;
-	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
-	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
-	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
-	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) }); x1 += stepAmountX1; y1 += stepAmountY1;
-	l->queuedEnemies.push_back({ 0, new Enemy(x1, y1, fireShrineX, fireShrineY, ElementType::WATER) });
+	std::function<void(unsigned int, int)> spawnBlues = [=](unsigned int startTime, int howMany)
+	{
+		//section 1
+		int x1 = waterShrineX; int y1 = waterShrineY; unsigned int delayAmount1 = 0; const int delayStep1 = 400;
 
+		//section 2
+		int x2 = waterShrineX; int y2 = waterShrineY; unsigned int delayAmount2 = 0; const int delayStep2 = 400;
 
+		for (int i = 0; i < howMany; i++)
+		{
+			//section 1
+			l->queuedEnemies.push_back({ startTime + delayAmount1, new Enemy(x1, y1, plantShrineX, plantShrineY, ElementType::WATER) });
+			delayAmount1 += delayStep1;
 
-	////attacking orbs
-	//for (unsigned int i = 1; i < 10; i++)
-	//{
-	//	int x2 = 100; int y2 = 400; const int x2Offset = 50;
-	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
-	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
-	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
-	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) }); x2 += x2Offset;
-	//	l->queuedEnemies.push_back({ i * 2000, new Enemy(x2, y2, plantShrineX, plantShrineY, ElementType::FIRE) });
-	//}
+			//section 2
+			l->queuedEnemies.push_back({ startTime + delayAmount2, new Enemy(x2, y2, fireShrineX, fireShrineY, ElementType::WATER) });
+			delayAmount2 += delayStep2;
+		}
+	};
+
+	std::function<void(unsigned int, int)> spawnGreens = [=](unsigned int startTime, int howMany)
+	{
+		//section 3
+		int x3 = plantShrineX; int y3 = plantShrineY; unsigned int delayAmount3 = 0; const int delayStep3 = 400;
+
+		//section 4
+		int x4 = plantShrineX; int y4 = plantShrineY; unsigned int delayAmount4 = 0; const int delayStep4 = 400;
+
+		for (int i = 0; i < howMany; i++)
+		{
+			//section 3
+			l->queuedEnemies.push_back({ startTime + delayAmount3, new Enemy(x3, y3, waterShrineX, waterShrineY, ElementType::PLANT) });
+			delayAmount3 += delayStep3;
+
+			//section 4
+			l->queuedEnemies.push_back({ startTime + delayAmount4, new Enemy(x4, y4, fireShrineX, fireShrineY, ElementType::PLANT) });
+			delayAmount4 += delayStep4;
+		}
+	};
+
+	std::function<void(unsigned int, int)> spawnReds = [=](unsigned int startTime, int howMany)
+	{
+		//section 5
+		int x5 = fireShrineX; int y5 = plantShrineY; unsigned int delayAmount5 = 0; const int delayStep5 = 400;
+
+		//section 6
+		int x6 = fireShrineX; int y6 = plantShrineY; unsigned int delayAmount6 = 0; const int delayStep6 = 400;
+
+		for (int i = 0; i < howMany; i++)
+		{
+			//section 5
+			l->queuedEnemies.push_back({ startTime + delayAmount5, new Enemy(x5, y5, waterShrineX, waterShrineY, ElementType::FIRE) });
+			delayAmount5 += delayStep5;
+
+			//section 6
+			l->queuedEnemies.push_back({ startTime + delayAmount6, new Enemy(x6, y6, plantShrineX, plantShrineY, ElementType::FIRE) });
+			delayAmount6 += delayStep6;
+		}
+	};
+
+	std::function<void(unsigned int, int)> spawnFinals = [=](unsigned int startTime, int howMany)
+	{
+		const int delayStep = 400;
+
+		//section blue
+		unsigned int delayAmountBlue = 0;
+
+		//section red
+		unsigned int delayAmountRed = 3000;
+
+		//section green
+		unsigned int delayAmountGreen = 6000;
+
+		for (int i = 0; i < howMany; i++)
+		{
+			//blues
+			l->queuedEnemies.push_back({ startTime + delayAmountBlue, new Enemy(waterShrineX, waterShrineY, fireShrineX, fireShrineY, ElementType::WATER) });
+			delayAmountBlue += delayStep;
+
+			//reds
+			l->queuedEnemies.push_back({ startTime + delayAmountRed, new Enemy(fireShrineX, fireShrineY, plantShrineX, plantShrineY, ElementType::FIRE) });
+			delayAmountRed += delayStep;
+
+			//greens
+			l->queuedEnemies.push_back({ startTime + delayAmountGreen, new Enemy(plantShrineX, plantShrineY, waterShrineX, waterShrineY, ElementType::PLANT) });
+			delayAmountGreen += delayStep;
+		}
+	};
+
+	spawnBlues(orbWaveDelay1, 5);
+
+	spawnGreens(orbWaveDelay2, 5);
+
+	spawnReds(orbWaveDelay3, 5);
+
+	spawnBlues(orbWaveDelay4, 5);
+
+	spawnReds(orbWaveDelay5, 3);
+
+	spawnGreens(orbWaveDelay6, 3);
+
+	spawnBlues(orbWaveDelay7, 1);
+	spawnReds(orbWaveDelay7 + 250, 1);
+	spawnGreens(orbWaveDelay7 + 500, 1);
+	
+
+	spawnBlues(orbWaveDelay8, 1);
+	spawnReds(orbWaveDelay8 + 250, 1); 
+	spawnGreens(orbWaveDelay8 + 500, 1);
+	
+
+	spawnBlues(orbWaveDelay9, 1);
+	spawnReds(orbWaveDelay9 + 250, 1);
+	spawnGreens(orbWaveDelay9 + 500, 1);
+
+	spawnBlues(orbWaveDelay10, 1);
+	spawnReds(orbWaveDelay10 + 250, 1);
+	spawnGreens(orbWaveDelay10 + 500, 1);
+
+	spawnFinals(orbWaveDelay11, 7);
+
+	return l;
+}
+
+Level* Level::createLevel18(unsigned int loadTime)
+{
+	const int LEVEL_NUMBER = 18;
+
+	const int textDelay = 1000;
+
+	Level* l = new Level(LEVEL_NUMBER, 0, 5, NONE, loadTime, false, false);
+
+	l->queuedText.push_back({ 225, (SCREEN_HEIGHT / 2) - 75, "Thanks for playing!",						textDelay, -1, Display::FontSize::THIRTYFOUR, false, -1, BLACK });
 
 	return l;
 }

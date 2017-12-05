@@ -21,6 +21,7 @@ public:
 private:
 	Player* player;
 	Level* currentLevel;
+	int lastLevelNumber;
 
 	int playerOrbCountTextId;
 	int playerHpTextId;
