@@ -19,7 +19,7 @@ Game::Game()
 	this->lastLevelNumber = 0;
 
 	//setup first level
-	this->LoadLevel(18);
+	this->LoadLevel(0);
 }
 
 #pragma endregion

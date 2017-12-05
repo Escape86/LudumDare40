@@ -121,7 +121,9 @@ bool Texture::Load()
 
 void Texture::Draw(int x, int y, SDL_Rect* clip /*= nullptr*/, double angle /*= 0.0*/, SDL_Point* center /*= nullptr*/, SDL_RendererFlip flip /*= SDL_FLIP_NONE*/)
 {
+#ifdef _DEBUG
 	assert(this->isLoaded);
+#endif
 
 	//Set rendering space and render to screen
 	int renderX = this->isForText ? x : x - (this->width / 2);

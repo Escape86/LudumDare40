@@ -338,7 +338,9 @@ Level* Level::createLevel0(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/Title.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",				textDelay, -1, Display::FontSize::TWENTY, false, -1, WHITE });
@@ -373,7 +375,9 @@ Level* Level::createLevel2(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/Controls.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -391,7 +395,9 @@ Level* Level::createLevel3(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/Elements.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -409,7 +415,9 @@ Level* Level::createLevel4(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/Goal.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -428,7 +436,9 @@ Level* Level::createLevel5(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/OrbLimit1.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -464,7 +474,9 @@ Level* Level::createLevel7(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/OrbLimit2.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -505,7 +517,9 @@ Level* Level::createLevel9(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/Weakness.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -523,7 +537,9 @@ Level* Level::createLevel10(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/Weakness2.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -558,7 +574,9 @@ Level* Level::createLevel12(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/GoalInfo.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
@@ -659,7 +677,9 @@ Level* Level::createLevel15(unsigned int loadTime)
 
 	Texture* t = new Texture("resources/Remember.png");
 	bool loaded = t->Load();
+#ifdef _DEBUG
 	assert(loaded);
+#endif
 	l->queuedTextures.push_back({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, -1, t, false });
 
 	l->queuedText.push_back({ 250, SCREEN_HEIGHT - 40, "Press any key to continue...",						textDelay, -1, Display::FontSize::TWENTY, false, -1, BLACK });
